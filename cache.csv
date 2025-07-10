@@ -1,0 +1,13 @@
+ID,Destination,Description,StartDate,EndDate,Status
+HCM_0607,Ho Chi Minh,Di cham co cung Bet,7/6/2025,7/6/2025,Completed
+DL_0712,Da Lat,Kham pha thanh pho suong mu cung nhom,12/7/2025,14/7/2025,Cancelled
+PQ_0905,Phu Quoc,Nghi duong bien dao cung nhom ban,5/9/2025,9/9/2025,Completed
+HN_1120,Ha Noi,Tham thu do ngan nam van hien,20/11/2025,24/11/2025,Cancelled
+S_0103,Sapa,Trekking vung nui Tay Bac,3/1/2026,6/1/2026,Ongoing
+NT_0318,Nha Trang,Tam bien va lan ngam san ho,18/3/2026,22/3/2026,Planned
+CT_0510,Can Tho,Trai nghiem mien Tay song nuoc,10/5/2026,11/5/2026,Cancelled
+HLB_0801,HA LONG BAY,Du thuyen va kham pha vinh Ha Long,1/8/2026,3/8/2026,Completed
+DN_0915,Da Nang,Du lich bien va nui ngu hanh son,15/9/2026,18/9/2026,Completed
+VHB_1015,Vinh Hy Bay,Lan bien ngam san ho tai vinh Vinh Hy,15/10/2026,17/10/2026,Completed
+NB_1202,Ninh Binh,Tham quan danh lam thang canh co do,2/12/2026,4/12/2026,Completed
+DL_0710,DA LAT,lmao lmao,10/7/2025,11/7/2025,Ongoing
