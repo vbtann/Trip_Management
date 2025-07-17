@@ -8,6 +8,7 @@ QMAKE_CXX.COMPILER_MACROS = \
     QMAKE_GCC_MINOR_VERSION \
     QMAKE_GCC_PATCH_VERSION
 QMAKE_CXX.INCDIRS = \
+    C:/Users/ADMIN/scoop/apps/gcc/current/include \
     C:/msys64/mingw64/include/c++/13.2.0 \
     C:/msys64/mingw64/include/c++/13.2.0/x86_64-w64-mingw32 \
     C:/msys64/mingw64/include/c++/13.2.0/backward \

@@ -14,7 +14,6 @@
 
 using namespace std;
 
-// Forward declaration since class TRIP is declared before these classes but uses these classes
 class PERSON;
 class MEMBER;
 class HOST;
@@ -61,54 +60,6 @@ class DATE {
     friend ostream &operator<<(ostream &, const DATE &);
 };
 
-// CLASS: TRIP
-class TRIP {
-   private:
-    static int tripCount;
-    string ID, Destination, Description;
-    DATE startDate, endDate;
-    STATUS status;
-    vector<MEMBER> members;
-    vector<HOST> hosts;
-
-   public:
-    // NOTE: Constructors
-    TRIP();
-    TRIP(const TRIP &other);
-    TRIP(const string &_tripID, const string &_dest, const string &_desc, int _startDay, int _startMonth,
-         int _startYear, int _endDay, int _endMonth, int _endYear, const STATUS &_status);
-    TRIP(const string &_tripID, const string &_dest, const string &_desc, const DATE &_startDate, const DATE &_endDate,
-         const STATUS &_status);
-
-    // ~TRIP() { tripCount--; }
-
-    // NOTE: Getters
-    string idProcess() const;
-    string getID() const;
-    string getDestination() const;
-    string getDescription() const;
-    DATE getStartDate() const;
-    DATE getEndDate() const;
-    STATUS getStatus() const;
-    string getStatusString() const;
-    static int getTripCount();
-
-    // NOTE: Setters
-    void setID(const string &_ID);
-    void setDestination(const string &_destination);
-    void setDescription(const string &_description);
-    void setStartDate(const DATE &_startDate);
-    void setEndDate(const DATE &_endDate);
-    void setStatus(const STATUS &_status);
-
-    // FUNC: Utility methods
-    void addMember(MEMBER &member);
-    void addHost(HOST &host);
-
-    TRIP &operator=(const TRIP &other);
-    friend ostream &operator<<(ostream &, const TRIP &);
-};
-
 // CLASS: PERSON
 class PERSON {
    protected:
@@ -122,8 +73,8 @@ class PERSON {
     PERSON(const string &_id, const string &_fullName, const GENDER &_gender, const DATE &_dob);
 
     virtual ~PERSON() = default;
-    virtual string getRole() const = 0;
-    virtual string getInfo() const = 0;
+    virtual string getRole() const;
+    virtual string getInfo() const;
 
     // FUNC: Getters
     string getFullName() const;
@@ -178,7 +129,7 @@ class MEMBER : public PERSON {
 
     // FUNC: Utility methods
     void addToTotalSpent(const double _amount);
-    void addInterest(const string &_intereest);
+    void addInterest(const string &_interest);
     void joinTrip(const string &_tripID);
     void leaveTrip(const string &_tripID);
     bool hasJoinedTrip(const string &_tripID);
@@ -206,6 +157,58 @@ class HOST : public PERSON {
     // FUNC: Utility methods
     bool hasHostedTrip(const string &_tripID);
     void hostTrip(const string &_tripID);
+};
+// CLASS: TRIP
+class TRIP {
+   private:
+    static int tripCount;
+    string ID, Destination, Description;
+    DATE startDate, endDate;
+    STATUS status;
+    vector<MEMBER> members;
+    HOST host;
+
+   public:
+    // NOTE: Constructors
+    TRIP();
+    TRIP(const TRIP &other);
+    TRIP(const string &_tripID, const string &_dest, const string &_desc, int _startDay, int _startMonth,
+         int _startYear, int _endDay, int _endMonth, int _endYear, const STATUS &_status);
+    TRIP(const string &_tripID, const string &_dest, const string &_desc, const DATE &_startDate, const DATE &_endDate,
+         const STATUS &_status);
+
+    // ~TRIP() { tripCount--; }
+
+    // NOTE: Getters
+    string idProcess() const;
+    string getID() const;
+    string getDestination() const;
+    string getDescription() const;
+    DATE getStartDate() const;
+    DATE getEndDate() const;
+    STATUS getStatus() const;
+    string getStatusString() const;
+    static int getTripCount();
+
+    HOST getHost() const;
+    vector<MEMBER> getMembers() const;
+
+    // NOTE: Setters
+    void setID(const string &_ID);
+    void setDestination(const string &_destination);
+    void setDescription(const string &_description);
+    void setStartDate(const DATE &_startDate);
+    void setEndDate(const DATE &_endDate);
+    void setStatus(const STATUS &_status);
+
+    // FUNC: Utility methods
+    void addMember(MEMBER member);
+    void setMembers(const vector<MEMBER> &members);
+    void setHost(HOST _host);
+    bool hasHost() const;
+
+    TRIP &operator=(const TRIP &other);
+    friend ostream &operator<<(ostream &, const TRIP &);
 };
 
 #endif  // HEADER_H

@@ -337,29 +337,30 @@ bool EditPersonDialog::validateNoDuplicates() {
     string currentEmail = emailLineEdit->text().trimmed().toStdString();
     string currentPhone = phoneLineEdit->text().trimmed().toStdString();
 
-    vector<PERSON*> allPeople = personManager->getAllPeople();
+    const vector<PERSON>& allPeople = personManager->getAllPeople();
 
-    for (PERSON* person : allPeople) {
-        if (!person || person == originalPerson) continue;  // Skip the current person being edited
+    for (const PERSON& person : allPeople) {
+        // Skip the current person being edited (compare by ID)
+        if (originalPerson && person.getID() == originalPerson->getID()) continue;
 
         // Check for duplicate email
-        if (!currentEmail.empty() && person->getEmail() == currentEmail) {
+        if (!currentEmail.empty() && person.getEmail() == currentEmail) {
             QMessageBox::warning(this, "Duplicate Email",
                                  QString("Another person already has this email address!\n\n"
                                          "Existing person: %1 (%2)")
-                                     .arg(QString::fromStdString(person->getFullName()))
-                                     .arg(QString::fromStdString(person->getRole())));
+                                     .arg(QString::fromStdString(person.getFullName()))
+                                     .arg(QString::fromStdString(person.getRole())));
             emailLineEdit->setFocus();
             return false;
         }
 
         // Check for duplicate phone
-        if (!currentPhone.empty() && person->getPhoneNumber() == currentPhone) {
+        if (!currentPhone.empty() && person.getPhoneNumber() == currentPhone) {
             QMessageBox::warning(this, "Duplicate Phone Number",
                                  QString("Another person already has this phone number!\n\n"
                                          "Existing person: %1 (%2)")
-                                     .arg(QString::fromStdString(person->getFullName()))
-                                     .arg(QString::fromStdString(person->getRole())));
+                                     .arg(QString::fromStdString(person.getFullName()))
+                                     .arg(QString::fromStdString(person.getRole())));
             phoneLineEdit->setFocus();
             return false;
         }

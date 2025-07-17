@@ -1,0 +1,42 @@
+# Ignore build files and generated content
+debug/
+release/
+*.o
+*.obj
+moc_*.cpp
+moc_*.h
+ui_*.h
+qrc_*.cpp
+Makefile*
+object_script.*
+.qmake.stash
+
+# Ignore IDE files
+.vscode/
+*.pro.user
+*.pro.user.*
+
+# Ignore temporary files
+*.tmp
+*.temp
+*~
+
+# Ignore log files
+*.log
+
+# Ignore cache files (but keep sample data)
+cache.csv
+people_cache.csv
+
+# Keep sample data files
+!People_info.csv
+!Trips_info.csv
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Backup files
+*.bak
+*.backup

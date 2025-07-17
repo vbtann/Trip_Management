@@ -23,48 +23,54 @@
 // ========================================
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
-    setWindowTitle("Trip Management System - Dashboard");
-    setMinimumSize(1200, 800);
-    resize(1400, 900);
-
-    // Initialize managers
-    tripManager = new TRIPMANAGER();
+    // Initialize managers first
     personManager = new PERSONMANAGER();
+    tripManager = new TRIPMANAGER();
 
     // Register as observer for both managers
+    personManager->addObserver(this);
     tripManager->addObserver(this);
-    personManager->addObserver(this);  // ADD THIS LINE
 
-    // Setup UI
     setupUI();
+    setupStatusBar();
+    setMinimumSize(1200, 900);
 
-    // Load initial data
-    vector<TRIP> temporaryVector;
-    loadCacheFromFile(temporaryVector);  // or however you load trips
-    for (TRIP &trip : temporaryVector) {
+    // IMPORTANT: Load people BEFORE loading trips (so attendees can be restored)
+    addDebugMessage("Loading people from cache...");
+    // PersonManager automatically loads people in its constructor
+
+    // Now load trips with attendees restoration
+    vector<TRIP> cachedTrips;
+    loadCacheFromFile(cachedTrips);  // This now includes attendees restoration
+
+    // Add cached trips to TripManager (which will trigger observer updates)
+    for (const TRIP &trip : cachedTrips) {
         tripManager->addTrip(trip);
     }
 
-    // Update display
-    if (tripsTable) {
-        updateTripDisplay(tripManager->getAllTrips());
-    }
-    if (statusLabel) {
-        updateStatusBar(tripManager->getAllTrips());
-    }
+    addDebugMessage("Application initialization completed");
 }
 
 MainWindow::~MainWindow() {
-    // Remove observers before destruction
+    addDebugMessage("Saving application state before exit...");
+
+    // Save trips with attendees
+    saveCacheToFile();
+
+    // PersonManager will save people in its destructor
+
+    // Clean up managers
+    if (personManager) {
+        personManager->removeObserver(this);
+        delete personManager;
+    }
+
     if (tripManager) {
         tripManager->removeObserver(this);
         delete tripManager;
     }
 
-    if (personManager) {
-        personManager->removeObserver(this);  // ADD THIS LINE
-        delete personManager;
-    }
+    addDebugMessage("Application shutdown completed");
 }
 
 // ========================================
@@ -166,7 +172,8 @@ void MainWindow::setupSidebar() {
     // Single button for people management
     QPushButton *managePeopleButton = new QPushButton("👥 Manage People");
     managePeopleButton->setStyleSheet(
-        "QPushButton { background-color: #9b59b6; color: white; font-weight: bold; }"
+        "QPushButton { background-color: #9b59b6; color: white; font-weight: "
+        "bold; }"
         "QPushButton:hover { background-color: #8e44ad; }");
 
     peopleLayout->addWidget(managePeopleButton);
@@ -321,11 +328,38 @@ void MainWindow::loadCacheFromFile(vector<TRIP> &outputTrips) {
     if (cacheFileExists()) {
         addDebugMessage("Loading cached trips from previous session...");
         size_t previousCount = outputTrips.size();
+
+        // Step 1: Load basic trip data first
         loadCacheFile(outputTrips);
+
+        // Step 2: Restore attendees using PersonManager
+        addDebugMessage("Restoring trip attendees from cache...");
+        restoreTripAttendeesFromCache(outputTrips, personManager, getCacheFilePath().toStdString());
+
         size_t loadedCount = outputTrips.size() - previousCount;
-        addDebugMessage(QString("Loaded %1 trips from cache").arg(loadedCount));
+        addDebugMessage(QString("Loaded %1 trips with attendees from cache").arg(loadedCount));
+
         if (loadedCount > 0) {
-            statusBar()->showMessage(QString("Loaded %1 trips from previous session").arg(loadedCount), 3000);
+            statusBar()->showMessage(QString("Loaded %1 trips with people data from previous session").arg(loadedCount),
+                                     3000);
+
+            // Debug: Show attendees info for verification
+            for (const TRIP &trip : outputTrips) {
+                HOST host = trip.getHost();
+                vector<MEMBER> members = trip.getMembers();
+
+                if (!host.getID().empty()) {
+                    addDebugMessage(QString("Trip %1 has host: %2")
+                                        .arg(QString::fromStdString(trip.getID()))
+                                        .arg(QString::fromStdString(host.getID())));
+                }
+
+                if (!members.empty()) {
+                    addDebugMessage(QString("Trip %1 has %2 members")
+                                        .arg(QString::fromStdString(trip.getID()))
+                                        .arg(members.size()));
+                }
+            }
         }
     } else {
         addDebugMessage("No cache file found. Starting with empty trip list.");
@@ -336,7 +370,8 @@ void MainWindow::loadCacheFromFile(vector<TRIP> &outputTrips) {
 void MainWindow::saveCacheToFile() {
     addDebugMessage("Updating cache file...");
     std::vector<TRIP> currentTrips = tripManager->getAllTrips();
-    updateCacheFile(currentTrips);
+
+    saveTripAttendeesToCache(currentTrips, getCacheFilePath().toStdString());
 }
 
 // ========================================
@@ -442,7 +477,7 @@ void MainWindow::onLoadProjectClicked() {
 void MainWindow::onAddTripClicked() {
     addDebugMessage("Opening Add Trip dialog...");
 
-    AddTripDialog dialog(this);
+    AddTripDialog dialog(personManager, this);
     if (dialog.exec() == QDialog::Accepted) {
         TRIP newTrip = dialog.getTripData();
         tripManager->addTrip(newTrip);
@@ -467,6 +502,7 @@ void MainWindow::onEditTripClicked() {
 
     if (it != allTrips.end()) {
         EditTripDialog editDialog(*it, this);
+        editDialog.setPersonManager(personManager);
 
         if (editDialog.exec() == QDialog::Accepted) {
             // Update the trip in the manager
@@ -520,7 +556,7 @@ void MainWindow::onViewTripDetailsClicked() {
                       [&](const TRIP &trip) { return trip.getID() == tripIdToView.toStdString(); });
 
     if (it != allTrips.end()) {
-        ViewTripDialog dialog(*it, this);  // Pass by reference
+        ViewTripDialog dialog(*it, personManager, this);  // Pass by reference
 
         if (dialog.exec() == QDialog::Accepted) {
             // Update the trip in the manager
@@ -607,11 +643,13 @@ void MainWindow::onRefreshViewClicked() {
 // }
 
 // void MainWindow::onValidateDataClicked() {
-//     QMessageBox::information(this, "Validate", "Data validation will be implemented.");
+//     QMessageBox::information(this, "Validate", "Data validation will be
+//     implemented.");
 // }
 
 // void MainWindow::onExportDebugLogClicked() {
-//     QMessageBox::information(this, "Export Log", "Debug log export will be implemented.");
+//     QMessageBox::information(this, "Export Log", "Debug log export will be
+//     implemented.");
 // }
 
 // ========================================
@@ -695,29 +733,35 @@ void MainWindow::onImportPeopleClicked() {
     }
 
     try {
-        // Get current people to merge with imported ones
-        vector<PERSON *> currentPeople = personManager->getAllPeople();
-        vector<PERSON *> importedPeople;
+        // Get current people to check for duplicates
+        vector<MEMBER> importedMembers;
+        vector<HOST> importedHosts;
 
         // Import new people
-        importPeopleInfo(importedPeople, filename.toStdString());
+        importPeopleInfo(importedMembers, importedHosts, filename.toStdString());
 
-        if (importedPeople.empty()) {
+        if (importedMembers.empty() && importedHosts.empty()) {
             QMessageBox::warning(this, "Import Failed", "No people found in the file or the file format is incorrect.");
             return;
         }
 
         int importCount = 0;
 
-        // Add each imported person if they don't already exist
-        for (PERSON *person : importedPeople) {
-            // Check if a person with the same ID already exists
-            if (!personManager->findPersonById(person->getID())) {
-                personManager->addPerson(person);
+        // Add each imported member if they don't already exist
+        for (const MEMBER &member : importedMembers) {
+            // Check if a member with the same ID already exists
+            if (!personManager->findMemberById(member.getID())) {
+                personManager->addMember(member);
                 importCount++;
-            } else {
-                // Duplicate found, free memory
-                delete person;
+            }
+        }
+
+        // Add each imported host if they don't already exist
+        for (const HOST &host : importedHosts) {
+            // Check if a host with the same ID already exists
+            if (!personManager->findHostById(host.getID())) {
+                personManager->addHost(host);
+                importCount++;
             }
         }
 
@@ -735,9 +779,10 @@ void MainWindow::onImportPeopleClicked() {
 void MainWindow::onExportPeopleClicked() {
     addDebugMessage("Opening People Export dialog...");
 
-    vector<PERSON *> people = personManager->getAllPeople();
+    const vector<MEMBER> &members = personManager->getAllMembers();
+    const vector<HOST> &hosts = personManager->getAllHosts();
 
-    if (people.empty()) {
+    if (members.empty() && hosts.empty()) {
         QMessageBox::warning(this, "Export Failed", "There are no people to export.");
         return;
     }
@@ -750,13 +795,14 @@ void MainWindow::onExportPeopleClicked() {
     }
 
     try {
-        exportPeopleInfo(people, filename.toStdString());
+        exportPeopleInfo(members, hosts, filename.toStdString());
 
+        int totalPeople = members.size() + hosts.size();
         QMessageBox::information(
             this, "Export Successful",
-            QString("Successfully exported %1 people to %2.").arg(people.size()).arg(QFileInfo(filename).fileName()));
+            QString("Successfully exported %1 people to %2.").arg(totalPeople).arg(QFileInfo(filename).fileName()));
 
-        addDebugMessage(QString("Exported %1 people to %2").arg(people.size()).arg(QFileInfo(filename).fileName()));
+        addDebugMessage(QString("Exported %1 people to %2").arg(totalPeople).arg(QFileInfo(filename).fileName()));
 
     } catch (const std::exception &e) {
         QMessageBox::critical(this, "Export Error", QString("An error occurred during export: %1").arg(e.what()));

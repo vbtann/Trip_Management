@@ -48,9 +48,16 @@ void ManagePeopleDialog::setupUI() {
     QGroupBox *statsGroup = new QGroupBox("Statistics");
     QGridLayout *statsLayout = new QGridLayout(statsGroup);
 
+    QString statsStyleSheet = "QLabel {font-size: 13px;}";
+
     personCountLabel = new QLabel("Total People: 0");
+    personCountLabel->setStyleSheet(statsStyleSheet);
+
     memberCountLabel = new QLabel("Members: 0");
+    memberCountLabel->setStyleSheet(statsStyleSheet);
+
     hostCountLabel = new QLabel("Hosts: 0");
+    hostCountLabel->setStyleSheet(statsStyleSheet);
 
     statsLayout->addWidget(personCountLabel, 0, 0);
     statsLayout->addWidget(memberCountLabel, 1, 0);
@@ -232,18 +239,22 @@ void ManagePeopleDialog::styleComponents() {
 void ManagePeopleDialog::refreshPersonList() {
     peopleListWidget->clear();
 
-    vector<PERSON *> allPeople = personManager->getAllPeople();
+    const vector<PERSON> &allPeople = personManager->getAllPeople();
 
-    for (PERSON *person : allPeople) {
+    for (const PERSON &person : allPeople) {
         QString itemText = QString("%1 - %2 (%3)")
-                               .arg(QString::fromStdString(person->getID()))
-                               .arg(QString::fromStdString(person->getFullName()))
-                               .arg(QString::fromStdString(person->getRole()));
+                               .arg(QString::fromStdString(person.getID()))
+                               .arg(QString::fromStdString(person.getFullName()))
+                               .arg(QString::fromStdString(person.getRole()));
 
         QListWidgetItem *item = new QListWidgetItem(itemText);
-        item->setData(Qt::UserRole, QString::fromStdString(person->getID()));
+        item->setData(Qt::UserRole, QString::fromStdString(person.getID()));
         peopleListWidget->addItem(item);
     }
+
+    editPersonButton->setEnabled(false);
+    deletePersonButton->setEnabled(false);
+    viewPersonButton->setEnabled(false);
 
     updatePersonInfo();
 }
@@ -270,6 +281,7 @@ void ManagePeopleDialog::updatePersonInfo() {
                                "<b>Name:</b> %2<br>"
                                "<b>Role:</b> %3<br>"
                                "<b>Gender:</b> %4<br>"
+                               "<b>Date of birth:</b> %9<br>"
                                "<b>Age:</b> %5<br>"
                                "<b>Email:</b> %6<br>"
                                "<b>Phone:</b> %7<br>"
@@ -281,7 +293,8 @@ void ManagePeopleDialog::updatePersonInfo() {
                                .arg(person->getAge())
                                .arg(QString::fromStdString(person->getEmail()))
                                .arg(QString::fromStdString(person->getPhoneNumber()))
-                               .arg(QString::fromStdString(person->getAddress()));
+                               .arg(QString::fromStdString(person->getAddress()))
+                               .arg(QString::fromStdString(person->getDateOfBirth().toString()));
 
             selectedPersonInfoLabel->setText(info);
         }
@@ -295,7 +308,8 @@ void ManagePeopleDialog::onAddPersonClicked() {
     if (dialog.exec() == QDialog::Accepted) {
         PERSON *newPerson = dialog.getPersonData();
         if (newPerson) {
-            personManager->addPerson(newPerson);
+            personManager->addPerson(*newPerson);
+            delete newPerson;  // Clean up the dynamically allocated person
             refreshPersonList();
             QMessageBox::information(this, "Success", "Person added successfully!");
         }
@@ -323,6 +337,7 @@ void ManagePeopleDialog::onEditPersonClicked() {
         if (updatedPerson) {
             // Update the person in the manager
             if (personManager->updatePerson(*person, *updatedPerson)) {
+                delete updatedPerson;  // Clean up the dynamically allocated person
                 refreshPersonList();
                 QMessageBox::information(this, "Success", "Person updated successfully!");
             } else {
@@ -400,29 +415,35 @@ void ManagePeopleDialog::onImportPeopleClicked() {
     }
 
     try {
-        // Get current people to merge with imported ones
-        vector<PERSON *> currentPeople = personManager->getAllPeople();
-        vector<PERSON *> importedPeople;
+        // Get current people to check for duplicates
+        vector<MEMBER> importedMembers;
+        vector<HOST> importedHosts;
 
         // Import new people
-        importPeopleInfo(importedPeople, filename.toStdString());
+        importPeopleInfo(importedMembers, importedHosts, filename.toStdString());
 
-        if (importedPeople.empty()) {
+        if (importedMembers.empty() && importedHosts.empty()) {
             QMessageBox::warning(this, "Import Failed", "No people found in the file or the file format is incorrect.");
             return;
         }
 
         int importCount = 0;
 
-        // Add each imported person if they don't already exist
-        for (PERSON *person : importedPeople) {
-            // Check if a person with the same ID already exists
-            if (!personManager->findPersonById(person->getID())) {
-                personManager->addPerson(person);
+        // Add each imported member if they don't already exist
+        for (const MEMBER &member : importedMembers) {
+            // Check if a member with the same ID already exists
+            if (!personManager->findMemberById(member.getID())) {
+                personManager->addMember(member);
                 importCount++;
-            } else {
-                // Duplicate found, free memory
-                delete person;
+            }
+        }
+
+        // Add each imported host if they don't already exist
+        for (const HOST &host : importedHosts) {
+            // Check if a host with the same ID already exists
+            if (!personManager->findHostById(host.getID())) {
+                personManager->addHost(host);
+                importCount++;
             }
         }
 
@@ -446,18 +467,20 @@ void ManagePeopleDialog::onExportPeopleClicked() {
     }
 
     try {
-        vector<PERSON *> people = personManager->getAllPeople();
+        const vector<MEMBER> &members = personManager->getAllMembers();
+        const vector<HOST> &hosts = personManager->getAllHosts();
 
-        if (people.empty()) {
+        if (members.empty() && hosts.empty()) {
             QMessageBox::warning(this, "Export Failed", "There are no people to export.");
             return;
         }
 
-        exportPeopleInfo(people, filename.toStdString());
+        exportPeopleInfo(members, hosts, filename.toStdString());
 
+        int totalPeople = members.size() + hosts.size();
         QMessageBox::information(
             this, "Export Successful",
-            QString("Successfully exported %1 people to %2.").arg(people.size()).arg(QFileInfo(filename).fileName()));
+            QString("Successfully exported %1 people to %2.").arg(totalPeople).arg(QFileInfo(filename).fileName()));
 
     } catch (const std::exception &e) {
         QMessageBox::critical(this, "Export Error", QString("An error occurred during export: %1").arg(e.what()));

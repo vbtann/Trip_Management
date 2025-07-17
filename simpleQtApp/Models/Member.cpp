@@ -26,13 +26,11 @@ bool MEMBER::getHasDriverLicense() const { return this->hasDriverLicense; }
 
 vector<string> MEMBER::getInterests() const { return this->interests; }
 
-double MEMBER::getTotalSpent() const { return this->totalSpent; }
+double MEMBER::getTotalSpent() const { return (this->totalSpent >= 0) ? this->totalSpent : 0.0; }
 
 string MEMBER::getRole() const { return "Member"; }
 
-string MEMBER::getInfo() const {
-    return this->fullName + " - " + to_string(this->getAge()) + " - " + genderToString(this->gender);
-}
+string MEMBER::getInfo() const { return this->ID + "  -  " + this->fullName + "  -  " + to_string(this->getAge()); }
 
 // FUNC: Setters
 void MEMBER::setEmergencyContact(const string &_contact) { this->emergencyContact = _contact; }

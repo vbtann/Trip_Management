@@ -18,6 +18,9 @@ string PERSON::toString() const {
     return info;
 }
 
+string PERSON::getRole() const { return "Person"; }
+string PERSON::getInfo() const { return this->toString(); }
+
 // FUNC: Getters
 string PERSON::getFullName() const { return this->fullName; }
 string PERSON::getID() const { return this->ID; }

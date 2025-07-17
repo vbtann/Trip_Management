@@ -1,6 +1,7 @@
 #include "FileManager.h"
 
 #include "../Models/header.h"
+#include "PersonManager.h"
 
 // Helper function to get cache file path
 QString getCacheFilePath() { return "D:/Study/HCMUS/1st year/sem 3/OOP/Project/cache.csv"; }
@@ -108,7 +109,7 @@ void importTripInfo(vector<TRIP> &trips, const string &filePath) {
                 qDebug() << "Found" << data.size() << "fields in line" << lineCount;
 
                 // Extract data - ADJUST INDICES to match your CSV structure
-                string destination = data[0];           // Was data[1]
+                string destination = toUpper(data[0]);  // Was data[1]
                 string description = data[1];           // Was data[2]
                 DATE startDate = extractDate(data[2]);  // Was data[3]
                 DATE endDate = extractDate(data[3]);    // Was data[4]
@@ -157,25 +158,42 @@ void printTrip(vector<TRIP> Trips) {
     }
 }
 
-// FUNC: Export to CSV file
+// FUNC: Export to CSV file - UPDATED to include attendees
 void exportTripsInfo(vector<TRIP> Trips, const string outputFilePath) {
-    fstream output(outputFilePath, ios::out);
-
+    ofstream output(outputFilePath);
     if (!output.is_open()) {
-        cout << "Error: Could not open output file: " << outputFilePath << endl;
-        return;
+        throw runtime_error("Cannot open file for writing: " + outputFilePath);
     }
 
-    // Write header
-    output << "ID,Destination,Description,StartDate,EndDate,Status\n";
+    // Write header with attendees columns
+    output << "ID,Destination,Description,StartDate,EndDate,Status,HostID,MemberIDs\n";
 
-    // Write trip data
     for (const TRIP &trip : Trips) {
+        // Basic trip information
         output << trip.getID() << "," << trip.getDestination() << "," << trip.getDescription() << ","
-               << trip.getStartDate() << "," << trip.getEndDate() << "," << trip.getStatusString() << "\n";
+               << trip.getStartDate().toString() << "," << trip.getEndDate().toString() << ","
+               << statusToString(trip.getStatus()) << ",";
+
+        // Host information
+        HOST host = trip.getHost();
+        if (!host.getID().empty()) {
+            output << host.getID();
+        }
+        output << ",";
+
+        // Members information (semicolon-separated list)
+        vector<MEMBER> members = trip.getMembers();
+        if (!members.empty()) {
+            for (size_t i = 0; i < members.size(); ++i) {
+                if (i > 0) output << ";";  // Separate multiple member IDs with semicolons
+                output << members[i].getID();
+            }
+        }
+        output << "\n";
     }
 
     output.close();
+    qDebug() << "Exported" << Trips.size() << "trips with attendees to file";
 }
 
 // FUNC: Update cache file from current trips
@@ -183,7 +201,8 @@ void updateCacheFile(const vector<TRIP> &Trips) {
     QString cacheFilePath = getCacheFilePath();
 
     try {
-        exportTripsInfo(Trips, cacheFilePath.toStdString());
+        // exportTripsInfo(Trips, cacheFilePath.toStdString());
+        saveTripAttendeesToCache(Trips, cacheFilePath.toStdString());
         qDebug() << "Cache file updated successfully:" << cacheFilePath;
     } catch (const exception &e) {
         qDebug() << "Error updating cache file:" << e.what();
@@ -225,8 +244,8 @@ bool peopleCacheFileExists() {
     return cacheFile.exists();
 }
 
-// FUNC: Import people from CSV file
-void importPeopleInfo(vector<PERSON *> &people, const string &filePath) {
+// FUNC: Import people from CSV file (updated for separate vectors)
+void importPeopleInfo(vector<MEMBER> &members, vector<HOST> &hosts, const string &filePath) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         QMessageBox::critical(nullptr, "Error", "Cannot open file!");
@@ -273,13 +292,13 @@ void importPeopleInfo(vector<PERSON *> &people, const string &filePath) {
                 string personID = PERSONFACTORY::generatePersonID(fullName, dob);
 
                 if (role == "Member") {
-                    MEMBER *member = new MEMBER(personID, fullName, gender, dob);
-                    member->setEmail(email);
-                    member->setPhoneNumber(phone);
-                    member->setAddress(address);
+                    MEMBER member(personID, fullName, gender, dob);
+                    member.setEmail(email);
+                    member.setPhoneNumber(phone);
+                    member.setAddress(address);
 
                     // Optional fields for Member
-                    if (data.size() > 7) member->setEmergencyContact(data[7]);
+                    if (data.size() > 7) member.setEmergencyContact(data[7]);
 
                     // Parse interests if available (comma-separated in quotes)
                     if (data.size() > 8) {
@@ -292,7 +311,7 @@ void importPeopleInfo(vector<PERSON *> &people, const string &filePath) {
                         stringstream ss(interestsStr);
                         string interest;
                         while (getline(ss, interest, ';')) {
-                            member->addInterest(interest);
+                            member.addInterest(interest);
                         }
                     }
 
@@ -300,23 +319,24 @@ void importPeopleInfo(vector<PERSON *> &people, const string &filePath) {
                     if (data.size() > 9) {
                         try {
                             double totalSpent = stod(data[9]);
-                            member->addToTotalSpent(totalSpent);
+                            totalSpent = (totalSpent < 0) ? totalSpent : 0.0;
+                            member.addToTotalSpent(totalSpent);
                         } catch (...) {
                             // Ignore conversion errors
                         }
                     }
 
-                    people.push_back(member);
+                    members.push_back(member);
                 } else if (role == "Host") {
-                    HOST *host = new HOST(personID, fullName, gender, dob);
-                    host->setEmail(email);
-                    host->setPhoneNumber(phone);
-                    host->setAddress(address);
+                    HOST host(personID, fullName, gender, dob);
+                    host.setEmail(email);
+                    host.setPhoneNumber(phone);
+                    host.setAddress(address);
 
                     // Optional fields for Host
-                    if (data.size() > 7) host->setEmergencyContact(data[7]);
+                    if (data.size() > 7) host.setEmergencyContact(data[7]);
 
-                    people.push_back(host);
+                    hosts.push_back(host);
                 }
             }
         } catch (const std::exception &e) {
@@ -326,11 +346,11 @@ void importPeopleInfo(vector<PERSON *> &people, const string &filePath) {
     }
 
     file.close();
-    qDebug() << "Imported" << people.size() << "people from file";
+    qDebug() << "Imported" << members.size() << "members and" << hosts.size() << "hosts from file";
 }
 
-// FUNC: Export people to CSV file
-void exportPeopleInfo(const vector<PERSON *> &people, const string &outputFilePath) {
+// FUNC: Export people to CSV file (updated for separate vectors)
+void exportPeopleInfo(const vector<MEMBER> &members, const vector<HOST> &hosts, const string &outputFilePath) {
     std::ofstream output(outputFilePath);
 
     if (!output.is_open()) {
@@ -343,47 +363,41 @@ void exportPeopleInfo(const vector<PERSON *> &people, const string &outputFilePa
     // Additional Member-specific headers
     output << ",Interests,TotalSpent\n";
 
-    // Write person data
-    for (const PERSON *person : people) {
-        if (!person) continue;
+    // Write member data
+    for (const MEMBER &member : members) {
+        output << member.getFullName() << "," << member.getDateOfBirth().toString() << "," << member.getEmail() << ","
+               << member.getPhoneNumber() << "," << genderToString(member.getGender()) << "," << member.getAddress()
+               << "," << member.getRole() << "," << member.getEmergencyContact() << ",";
 
-        // Common fields for all people
-        output << person->getFullName() << "," << person->getDateOfBirth().toString() << "," << person->getEmail()
-               << "," << person->getPhoneNumber() << "," << genderToString(person->getGender()) << ","
-               << person->getAddress() << "," << person->getRole() << ",";
-
-        // Role-specific fields
-        if (person->getRole() == "Member") {
-            const MEMBER *member = static_cast<const MEMBER *>(person);
-            output << member->getEmergencyContact() << ",";
-
-            // Interests - semicolon-separated within quotes
-            output << "\"";
-            const vector<string> &interests = member->getInterests();
-            for (size_t i = 0; i < interests.size(); i++) {
-                output << interests[i];
-                if (i < interests.size() - 1) {
-                    output << ";";
-                }
+        // Interests - semicolon-separated within quotes
+        output << "\"";
+        const vector<string> &interests = member.getInterests();
+        for (size_t i = 0; i < interests.size(); i++) {
+            output << interests[i];
+            if (i < interests.size() - 1) {
+                output << ";";
             }
-            output << "\",";
-
-            // Total spent
-            output << member->getTotalSpent();
-        } else if (person->getRole() == "Host") {
-            const HOST *host = static_cast<const HOST *>(person);
-            output << host->getEmergencyContact() << ",,";  // Empty fields for Member-specific columns
         }
+        output << "\",";
 
-        output << "\n";
+        // Total spent
+        output << member.getTotalSpent() << "\n";
+    }
+
+    // Write host data
+    for (const HOST &host : hosts) {
+        output << host.getFullName() << "," << host.getDateOfBirth().toString() << "," << host.getEmail() << ","
+               << host.getPhoneNumber() << "," << genderToString(host.getGender()) << "," << host.getAddress() << ","
+               << host.getRole() << "," << host.getEmergencyContact()
+               << ",,\n";  // Empty fields for Member-specific columns
     }
 
     output.close();
-    qDebug() << "Exported" << people.size() << "people to file";
+    qDebug() << "Exported" << members.size() << "members and" << hosts.size() << "hosts to file";
 }
 
-// FUNC: Load people from cache file
-void loadPeopleCacheFile(vector<PERSON *> &people) {
+// FUNC: Load people from cache file (updated for separate vectors)
+void loadPeopleCacheFile(vector<MEMBER> &members, vector<HOST> &hosts) {
     QString cacheFilePath = getPeopleCacheFilePath();
 
     QFileInfo cacheFile(cacheFilePath);
@@ -395,35 +409,32 @@ void loadPeopleCacheFile(vector<PERSON *> &people) {
     try {
         qDebug() << "Loading people from cache:" << cacheFilePath;
 
-        // Free existing people before clearing the vector
-        for (PERSON *person : people) {
-            delete person;
-        }
-        people.clear();
+        members.clear();
+        hosts.clear();
 
         // Import from cache file
-        importPeopleInfo(people, cacheFilePath.toStdString());
+        importPeopleInfo(members, hosts, cacheFilePath.toStdString());
 
-        qDebug() << "Successfully loaded" << people.size() << "people from cache";
+        qDebug() << "Successfully loaded" << members.size() << "members and" << hosts.size() << "hosts from cache";
 
     } catch (const exception &e) {
         qDebug() << "Error loading people cache file:" << e.what();
     }
 }
 
-// FUNC: Update people cache file
-void updatePeopleCacheFile(const vector<PERSON *> &people) {
+// FUNC: Update people cache file (updated for separate vectors)
+void updatePeopleCacheFile(const vector<MEMBER> &members, const vector<HOST> &hosts) {
     QString cacheFilePath = getPeopleCacheFilePath();
 
     try {
-        exportPeopleInfo(people, cacheFilePath.toStdString());
+        exportPeopleInfo(members, hosts, cacheFilePath.toStdString());
         qDebug() << "People cache file updated successfully:" << cacheFilePath;
     } catch (const exception &e) {
         qDebug() << "Error updating people cache file:" << e.what();
     }
 }
 
-// FUNC: Import trips from cache file (includes IDs)
+// FUNC: Import trips from cache file (includes IDs and attendees) - UPDATED
 void importTripFromCache(vector<TRIP> &trips, const string &filePath) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
@@ -435,15 +446,12 @@ void importTripFromCache(vector<TRIP> &trips, const string &filePath) {
     // Skip header line if it exists
     if (std::getline(file, line) &&
         (line.find("ID") != std::string::npos || line.find("Destination") != std::string::npos)) {
-        // This was a header line, continue reading
         qDebug() << "Found header line:" << QString::fromStdString(line);
     } else {
-        // This wasn't a header, reset file position to read from beginning
         file.clear();
         file.seekg(0);
     }
 
-    // For debugging
     int lineCount = 0;
     int successCount = 0;
 
@@ -453,12 +461,10 @@ void importTripFromCache(vector<TRIP> &trips, const string &filePath) {
 
         qDebug() << "Processing cache line" << lineCount << ":" << QString::fromStdString(line);
 
-        // Parse CSV line
+        // Parse CSV line with better handling
         std::vector<std::string> data;
         std::stringstream ss(line);
         std::string token;
-
-        // Better CSV parsing that handles quotes and commas within fields
         bool inQuotes = false;
         std::string field;
 
@@ -472,16 +478,15 @@ void importTripFromCache(vector<TRIP> &trips, const string &filePath) {
                 field += c;
             }
         }
-        // Add the last field
-        data.push_back(field);
+        data.push_back(field);  // Add the last field
 
         try {
-            // Check if we have enough data fields (must have ID column)
-            if (data.size() >= 6) {  // ID,Destination,Description,StartDate,EndDate,Status
+            // Check if we have enough data fields (now expecting 8 fields with attendees)
+            if (data.size() >= 6) {  // At minimum: ID,Destination,Description,StartDate,EndDate,Status
                 qDebug() << "Found" << data.size() << "fields in cache line" << lineCount;
 
-                // Extract data - use correct indices for cache format
-                string id = data[0];  // ID is first field
+                // Extract basic trip data
+                string id = data[0];
                 string destination = data[1];
                 string description = data[2];
                 DATE startDate = extractDate(data[3]);
@@ -501,25 +506,201 @@ void importTripFromCache(vector<TRIP> &trips, const string &filePath) {
                     status = STATUS::Planned;  // Default
                 }
 
-                // Create trip with the ID from the cache file
+                // Create trip with basic data
                 TRIP newTrip(id, destination, description, startDate, endDate, status);
 
-                // Add to the trips vector
+                // Add host if available (data[6])
+                if (data.size() > 6 && !data[6].empty()) {
+                    string hostID = data[6];
+                    qDebug() << "Trip" << QString::fromStdString(id)
+                             << "has host ID:" << QString::fromStdString(hostID);
+
+                    // Note: We'll need to restore the actual HOST object from PersonManager
+                    // For now, we store the ID and will restore the object later
+                    // This requires coordination with PersonManager
+                }
+
+                // Add members if available (data[7])
+                if (data.size() > 7 && !data[7].empty()) {
+                    string memberIDsString = data[7];
+                    qDebug() << "Trip" << QString::fromStdString(id)
+                             << "has member IDs:" << QString::fromStdString(memberIDsString);
+
+                    // Parse semicolon-separated member IDs
+                    std::stringstream memberStream(memberIDsString);
+                    std::string memberID;
+                    while (std::getline(memberStream, memberID, ';')) {
+                        if (!memberID.empty()) {
+                            qDebug() << "  - Member ID:" << QString::fromStdString(memberID);
+                            // Note: We'll need to restore the actual MEMBER objects from PersonManager
+                        }
+                    }
+                }
+
                 trips.push_back(newTrip);
                 successCount++;
                 qDebug() << "Successfully loaded trip from cache:" << QString::fromStdString(id) << "-"
                          << QString::fromStdString(destination);
+
             } else {
-                qDebug() << "Error: Not enough fields in cache line" << lineCount << ". Expected at least 6, got"
-                         << data.size();
+                qDebug() << "Insufficient data fields in cache line" << lineCount << "- found" << data.size()
+                         << "fields";
             }
-        } catch (const std::exception &e) {
-            qDebug() << "Error parsing trip data at line" << lineCount << ":" << QString::fromStdString(line) << " - "
-                     << QString::fromStdString(e.what());
+
+        } catch (const exception &e) {
+            qDebug() << "Error parsing cache line" << lineCount << ":" << e.what();
         }
     }
 
     file.close();
-    qDebug() << "Cache import complete. Processed" << lineCount << "lines, successfully imported" << successCount
+    qDebug() << "Cache import completed. Processed" << lineCount << "lines, successfully loaded" << successCount
              << "trips";
+}
+
+// FUNC: Restore trip attendees from cache file - UPDATED for objects
+void restoreTripAttendeesFromCache(vector<TRIP> &trips, PERSONMANAGER *personManager, const string &filePath) {
+    if (!personManager) {
+        qDebug() << "PersonManager is null, cannot restore trip attendees";
+        return;
+    }
+
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        qDebug() << "Error: Cannot open cache file for attendee restoration:" << QString::fromStdString(filePath);
+        return;
+    }
+
+    std::string line;
+    // Skip header line
+    if (std::getline(file, line)) {
+        // Header skipped
+    }
+
+    int lineCount = 0;
+    while (std::getline(file, line)) {
+        lineCount++;
+        if (line.empty()) continue;
+
+        // Parse CSV line
+        std::vector<std::string> data;
+        std::stringstream ss(line);
+        std::string token;
+        bool inQuotes = false;
+        std::string field;
+
+        for (char c : line) {
+            if (c == '"') {
+                inQuotes = !inQuotes;
+            } else if (c == ',' && !inQuotes) {
+                data.push_back(field);
+                field.clear();
+            } else {
+                field += c;
+            }
+        }
+        data.push_back(field);
+
+        if (data.size() >= 6) {
+            string tripID = data[0];
+
+            // Find the corresponding trip in our trips vector
+            for (TRIP &trip : trips) {
+                if (trip.getID() == tripID) {
+                    // Restore host if available
+                    if (data.size() > 6 && !data[6].empty()) {
+                        string hostID = data[6];
+                        HOST host = personManager->getHostByID(hostID);  // FIX: Get object, not pointer
+                        if (!host.getID().empty()) {                     // FIX: Check if host is valid (has ID)
+                            trip.setHost(host);
+                            qDebug() << "Restored host" << QString::fromStdString(hostID) << "to trip"
+                                     << QString::fromStdString(tripID);
+                        } else {
+                            qDebug() << "Warning: Host with ID" << QString::fromStdString(hostID)
+                                     << "not found in PersonManager";
+                        }
+                    }
+
+                    // Restore members if available
+                    if (data.size() > 7 && !data[7].empty()) {
+                        string memberIDsString = data[7];
+                        std::stringstream memberStream(memberIDsString);
+                        std::string memberID;
+
+                        while (std::getline(memberStream, memberID, ';')) {
+                            if (!memberID.empty()) {
+                                MEMBER member = personManager->getMemberByID(memberID);  // FIX: Get object, not pointer
+                                if (!member.getID().empty()) {  // FIX: Check if member is valid (has ID)
+                                    trip.addMember(member);
+                                    qDebug() << "Restored member" << QString::fromStdString(memberID) << "to trip"
+                                             << QString::fromStdString(tripID);
+                                } else {
+                                    qDebug() << "Warning: Member with ID" << QString::fromStdString(memberID)
+                                             << "not found in PersonManager";
+                                }
+                            }
+                        }
+                    }
+                    break;  // Found the trip, no need to continue searching
+                }
+            }
+        }
+    }
+
+    file.close();
+    qDebug() << "Trip attendees restoration completed";
+}
+
+// FUNC: Save trip attendees to cache file - NEW
+void saveTripAttendeesToCache(const vector<TRIP> &trips, const string &filePath) {
+    std::ofstream output(filePath);
+    if (!output.is_open()) {
+        qDebug() << "Error: Cannot open cache file for writing:" << QString::fromStdString(filePath);
+        return;
+    }
+
+    // Write header with attendees columns
+    output << "ID,Destination,Description,StartDate,EndDate,Status,HostID,MemberIDs\n";
+
+    int savedCount = 0;
+    for (const TRIP &trip : trips) {
+        try {
+            // Basic trip information
+            output << trip.getID() << "," << trip.getDestination() << "," << trip.getDescription() << ","
+                   << trip.getStartDate().toString() << "," << trip.getEndDate().toString() << ","
+                   << statusToString(trip.getStatus()) << ",";
+
+            // Host information
+            HOST host = trip.getHost();
+            if (!host.getID().empty()) {
+                output << host.getID();
+                qDebug() << "Saving host" << QString::fromStdString(host.getID()) << "for trip"
+                         << QString::fromStdString(trip.getID());
+            }
+            output << ",";
+
+            // Members information (semicolon-separated list)
+            vector<MEMBER> members = trip.getMembers();
+            if (!members.empty()) {
+                qDebug() << "Saving" << members.size() << "members for trip" << QString::fromStdString(trip.getID());
+
+                for (size_t i = 0; i < members.size(); ++i) {
+                    if (i > 0) output << ";";  // Separate multiple member IDs with semicolons
+                    output << members[i].getID();
+
+                    qDebug() << "  - Member:" << QString::fromStdString(members[i].getID());
+                }
+            }
+            output << "\n";
+
+            savedCount++;
+
+        } catch (const std::exception &e) {
+            qDebug() << "Error saving trip" << QString::fromStdString(trip.getID())
+                     << "to cache:" << QString::fromStdString(e.what());
+        }
+    }
+
+    output.close();
+    qDebug() << "Successfully saved" << savedCount
+             << "trips with attendees to cache file:" << QString::fromStdString(filePath);
 }

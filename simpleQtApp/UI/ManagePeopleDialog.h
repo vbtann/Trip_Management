@@ -1,16 +1,23 @@
 #ifndef MANAGEPEOPLEDIALOG_H
 #define MANAGEPEOPLEDIALOG_H
 
+#include <QCheckBox>
+#include <QComboBox>
+#include <QDate>
+#include <QDateEdit>
 #include <QDialog>
+#include <QFormLayout>
+#include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QListWidget>
-#include <QListWidgetItem>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QSplitter>
+#include <QTextEdit>
 #include <QVBoxLayout>
+#include <QVariant>
 
 #include "../Managers/Observer.h"
 #include "../Managers/PersonManager.h"

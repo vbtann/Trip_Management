@@ -16,7 +16,7 @@ TRIP::TRIP(const TRIP &other)
       endDate(other.endDate),
       status(other.status),
       members(other.members),
-      hosts(other.hosts) {}
+      host(other.host) {}
 
 TRIP::TRIP(const string &_tripID, const string &_dest, const string &_desc, int _startDay, int _startMonth,
            int _startYear, int _endDay, int _endMonth, int _endYear, const STATUS &_status)
@@ -116,6 +116,10 @@ string TRIP::getStatusString() const {
     }
 }
 
+HOST TRIP::getHost() const { return this->host; }
+
+vector<MEMBER> TRIP::getMembers() const { return this->members; }
+
 // int TRIP::getTripCount() { return tripCount; }
 
 // FUNC: Setters
@@ -132,7 +136,7 @@ void TRIP::setEndDate(const DATE &_endDate) { this->endDate = _endDate; }
 void TRIP::setStatus(const STATUS &_status) { this->status = _status; }
 
 // FUNC: Utility methods
-void TRIP::addMember(MEMBER &member) {
+void TRIP::addMember(MEMBER member) {
     auto it = find_if(members.begin(), members.end(),
                       [&](const MEMBER &_member) { return member.getID() == _member.getID(); });
 
@@ -143,15 +147,14 @@ void TRIP::addMember(MEMBER &member) {
     }
 }
 
-void TRIP::addHost(HOST &host) {
-    auto it = find_if(hosts.begin(), hosts.end(), [&](const HOST &_host) { return host.getID() == _host.getID(); });
+void TRIP::setMembers(const vector<MEMBER> &members) { this->members = members; }
 
-    // Add host to trip if not exist
-    if (it == hosts.end()) {
-        hosts.push_back(host);
-        host.hostTrip(this->getID());
-    }
+void TRIP::setHost(HOST _host) {
+    this->host = _host;
+    _host.hostTrip(this->getID());
 }
+
+bool TRIP::hasHost() const { return !this->host.getID().empty(); }
 
 TRIP &TRIP::operator=(const TRIP &other) {
     if (this != &other) {
@@ -162,7 +165,7 @@ TRIP &TRIP::operator=(const TRIP &other) {
         this->endDate = other.endDate;
         this->status = other.status;
         this->members = other.members;
-        this->hosts = other.hosts;
+        this->host = other.host;
     }
 
     return *this;

@@ -274,15 +274,11 @@ bool AddPersonDialog::validateNoDuplicate() {
     QDate dob = dobDateEdit->date();
     DATE currentDateOfBirth(dob.day(), dob.month(), dob.year());
 
-    vector<PERSON *> people = personManager->getAllPeople();
+    vector<PERSON> people = personManager->getAllPeople();
 
-    for (PERSON *person : people) {
-        if (!person) {
-            continue;
-        }
-
-        bool samePhoneNumber = (person->getPhoneNumber() == currentPhoneNumber);
-        bool sameEmail = (person->getEmail() == currentEmail);
+    for (const PERSON &person : people) {
+        bool samePhoneNumber = (person.getPhoneNumber() == currentPhoneNumber);
+        bool sameEmail = (person.getEmail() == currentEmail);
 
         if (samePhoneNumber && !currentPhoneNumber.empty()) {
             QMessageBox::warning(this, "Duplicate phone number", "A person with this phone number already existed!");

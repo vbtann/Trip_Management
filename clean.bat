@@ -1,21 +1,28 @@
 @echo off
-echo Cleaning build files...
+echo ========================================
+echo Trip Management System - Clean Build
+echo ========================================
+echo.
 
-REM Remove console app executable
-if exist main.exe del main.exe
+cd /d "%~dp0\simpleQtApp"
 
-REM Remove Qt build directory
-if exist "simpleQtApp\build" (
-    rmdir /s /q "simpleQtApp\build"
-    echo Removed simpleQtApp\build directory
+echo Cleaning all build files...
+if exist Makefile del Makefile
+if exist Makefile.Debug del Makefile.Debug
+if exist Makefile.Release del Makefile.Release
+if exist .qmake.stash del .qmake.stash
+if exist object_script.simpleQtApp.Debug del object_script.simpleQtApp.Debug
+if exist object_script.simpleQtApp.Release del object_script.simpleQtApp.Release
+
+if exist debug (
+    echo Removing debug directory...
+    rmdir /s /q debug
 )
 
-REM Remove old qmake files if they exist
-if exist "simpleQtApp\Makefile" del "simpleQtApp\Makefile"
-if exist "simpleQtApp\Makefile.Debug" del "simpleQtApp\Makefile.Debug"
-if exist "simpleQtApp\Makefile.Release" del "simpleQtApp\Makefile.Release"
-if exist "simpleQtApp\release" rmdir /s /q "simpleQtApp\release"
-if exist "simpleQtApp\debug" rmdir /s /q "simpleQtApp\debug"
+if exist release (
+    echo Removing release directory...
+    rmdir /s /q release
+)
 
-echo Clean complete!
+echo Clean completed!
 pause

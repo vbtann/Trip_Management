@@ -1,5 +1,0 @@
-Script	Speed	Use Case
-instant_run.bat	⚡⚡⚡ Fastest	Quick development iterations
-quick_build.bat	⚡⚡ Very Fast	Daily development
-dev_build.bat	⚡ Fast	Development with some safety
-compile.bat	🐌 Slow	Full clean builds

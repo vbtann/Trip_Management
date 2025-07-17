@@ -2,46 +2,159 @@
 
 ## 📋 Overview
 
-The **Trip Management System** is a comprehensive application designed to help friend groups organize, plan, and manage their trips efficiently. Built with C++ and Qt framework, it provides both console and GUI interfaces for seamless trip management.
+The **Trip Management System** is a comprehensive Qt-based desktop application designed to help friend groups organize, plan, and manage their trips efficiently. Built with C++ and Qt framework, it provides an intuitive GUI interface for seamless trip and people management.
 
-## 🚀 What It Is
+## 🚀 Quick Start
 
-A desktop application that allows friend groups to:
-- Create and manage trip information
-- Import/export trip data
-- Search and filter trips
-- Track trip status and dates
-- Collaborate on trip planning
+### Prerequisites
+- **Qt Framework** (version 5.15 or higher recommended)
+- **C++ Compiler** (MinGW, MSVC, or GCC)
+- **qmake** (comes with Qt installation)
 
-## ⚙️ How It Works
+### Installation Steps
 
-The system operates through two main interfaces:
+1. **Download Qt**
+   - Visit [Qt Official Website](https://www.qt.io/download-qt-installer)
+   - Download and install Qt with MinGW compiler
+   - Make sure to add Qt's bin directory to your system PATH
 
-### Console Interface
-- Command-line interaction for basic operations
-- Quick data manipulation and testing
-- Batch processing capabilities
+2. **Download This Project**
+   - Download the ZIP file from GitHub
+   - Extract to your desired location
 
-### GUI Interface (Qt-based)
-- User-friendly graphical interface
-- Interactive forms and dialogs
-- Visual trip browsing and management
+3. **Build and Run**
+   ```batch
+   # Simply double-click build.bat
+   # Or run from command line:
+   build.bat
+   ```
 
-## 🛠️ Core Components
+4. **Launch Application**
+   ```batch
+   # Double-click run.bat
+   # Or run from command line:
+   run.bat
+   ```
 
-### Data Models
-- **Trip**: Core entity containing trip information
-- **Date**: Custom date handling system
-- **Status**: Trip status enumeration (Planned, Ongoing, Completed, Cancelled)
+### Alternative Manual Build
+If the batch files don't work, you can build manually:
+```bash
+cd simpleQtApp
+qmake simpleQtApp.pro
+make
+```
 
-### Managers
-- **TripManager**: Handles trip operations and business logic
-- **FileManager**: Manages import/export operations
+## 🛠️ Features
+
+### Trip Management
+- ✅ **Create Trips**: Add new trips with detailed information
+- ✅ **Edit Trips**: Modify existing trip details
+- ✅ **Delete Trips**: Remove unwanted trips
+- ✅ **View Trip Details**: Comprehensive trip information display
+- ✅ **Trip Status Tracking**: Plan, Ongoing, Completed, Cancelled
+
+### People Management
+- ✅ **Add People**: Register hosts and members
+- ✅ **Import/Export People**: CSV file support
+- ✅ **Assign Attendees**: Link people to trips
+- ✅ **Edit Person Details**: Update contact information
+
+### Data Management
+- ✅ **Import/Export Trips**: CSV file support
+- ✅ **Auto-save**: Automatic data persistence
+- ✅ **Filter and Search**: Find trips quickly
+- ✅ **Data Validation**: Ensure data integrity
 
 ### User Interface
-- **MainWindow**: Primary application interface
-- **AddTripDialog**: Trip creation interface
-- **ViewTripDialog**: Trip browsing interface
+- ✅ **Modern GUI**: Clean and intuitive interface
+- ✅ **Dashboard View**: Overview of all trips
+- ✅ **Dialog-based Forms**: Easy data entry
+- ✅ **Status Bar**: Real-time feedback
+
+## 📁 Project Structure
+
+```
+Trip_Management/
+├── simpleQtApp/
+│   ├── main.cpp              # Application entry point
+│   ├── simpleQtApp.pro       # Qt project file
+│   ├── UI/                   # User interface files
+│   │   ├── MainWindow.cpp/h
+│   │   ├── AddTripDialog.cpp/h
+│   │   ├── EditTripDialog.cpp/h
+│   │   ├── ViewTripDialog.cpp/h
+│   │   ├── FilterTripDialog.cpp/h
+│   │   └── ManagePeopleDialog.cpp/h
+│   ├── Models/               # Data models
+│   │   ├── Trip.cpp
+│   │   ├── Person.cpp
+│   │   ├── Date.cpp
+│   │   └── header.h
+│   └── Managers/             # Business logic
+│       ├── TripManager.cpp/h
+│       ├── PersonManager.cpp/h
+│       └── FileManager.cpp/h
+├── build.bat                 # Build script
+├── run.bat                   # Run script
+├── clean.bat                 # Clean script
+└── README.md                 # This file
+```
+
+## � Troubleshooting
+
+### Common Issues
+
+**Q: "qmake not found" error**
+A: Make sure Qt is installed and added to your system PATH
+- Windows: Add `C:\Qt\6.x.x\mingw_64\bin` to PATH
+- Restart command prompt after changing PATH
+
+**Q: Build fails with compiler errors**
+A: Ensure you have a compatible C++ compiler installed
+- For Windows: Install Qt with MinGW or Visual Studio
+
+**Q: Application doesn't start**
+A: Check if Qt runtime libraries are available
+- Make sure Qt's bin directory is in PATH
+- Or copy Qt DLLs to the application directory
+
+**Q: Data files not loading**
+A: Ensure the application has write permissions in its directory
+
+### Getting Help
+If you encounter issues:
+1. Check that Qt is properly installed
+2. Verify your compiler setup
+3. Make sure all dependencies are met
+4. Try building manually with qmake + make
+
+## 📊 Sample Data
+
+The application comes with sample data files:
+- `People_info.csv` - Sample people data
+- `Trips_info.csv` - Sample trips data
+
+You can import these files to quickly test the application's features.
+
+## 🎯 Usage Tips
+
+1. **Start with People**: Import or add people before creating trips
+2. **Use Import/Export**: Easily share data between users
+3. **Regular Backups**: Export your data regularly
+4. **Filter Views**: Use filters to manage large datasets
+5. **Status Updates**: Keep trip statuses current
+
+## 🔮 Future Enhancements
+
+- [ ] Database integration
+- [ ] Network sharing capabilities
+- [ ] Mobile app companion
+- [ ] Advanced reporting
+- [ ] Calendar integration
+
+## 👥 Contributing
+
+This is a student project for OOP course. Feedback and suggestions are welcome!
 
 ## 📚 Functions & Features
 

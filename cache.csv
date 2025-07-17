@@ -1,13 +1,13 @@
-ID,Destination,Description,StartDate,EndDate,Status
-HCM_0607,Ho Chi Minh,Di cham co cung Bet,7/6/2025,7/6/2025,Completed
-DL_0712,Da Lat,Kham pha thanh pho suong mu cung nhom,12/7/2025,14/7/2025,Cancelled
-PQ_0905,Phu Quoc,Nghi duong bien dao cung nhom ban,5/9/2025,9/9/2025,Completed
-HN_1120,Ha Noi,Tham thu do ngan nam van hien,20/11/2025,24/11/2025,Cancelled
-S_0103,Sapa,Trekking vung nui Tay Bac,3/1/2026,6/1/2026,Ongoing
-NT_0318,Nha Trang,Tam bien va lan ngam san ho,18/3/2026,22/3/2026,Planned
-CT_0510,Can Tho,Trai nghiem mien Tay song nuoc,10/5/2026,11/5/2026,Cancelled
-HLB_0801,HA LONG BAY,Du thuyen va kham pha vinh Ha Long,1/8/2026,3/8/2026,Completed
-DN_0915,Da Nang,Du lich bien va nui ngu hanh son,15/9/2026,18/9/2026,Completed
-VHB_1015,Vinh Hy Bay,Lan bien ngam san ho tai vinh Vinh Hy,15/10/2026,17/10/2026,Completed
-NB_1202,Ninh Binh,Tham quan danh lam thang canh co do,2/12/2026,4/12/2026,Completed
-DL_0710,DA LAT,lmao lmao,10/7/2025,11/7/2025,Ongoing
+ID,Destination,Description,StartDate,EndDate,Status,HostID,MemberIDs
+VT_0426,VUNG TAU,Di cham bien cung Bet,26/04/2025,27/04/2025,Completed,,
+HCM_0607,HO CHI MINH,Di cham co cung Bet,07/06/2025,07/06/2025,Completed,,
+DL_0712,DA LAT,Kham pha thanh pho suong mu cung nhom,12/07/2025,14/07/2025,Cancelled,,
+PQ_0905,PHU QUOC,Nghi duong bien dao cung nhom ban,05/09/2025,09/09/2025,Completed,,
+HN_1120,HA NOI,Tham thu do ngan nam van hien,20/11/2025,24/11/2025,Cancelled,,
+S_0103,SAPA,Trekking vung nui Tay Bac,03/01/2026,06/01/2026,Ongoing,,
+NT_0318,NHA TRANG,Tam bien va lan ngam san ho,18/03/2026,22/03/2026,Planned,,
+CT_0510,CAN THO,Trai nghiem mien Tay song nuoc,10/05/2026,11/05/2026,Cancelled,,
+HLB_0801,HA LONG BAY,Du thuyen va kham pha vinh Ha Long,01/08/2026,03/08/2026,Completed,,
+DN_0915,DA NANG,Du lich bien va nui ngu hanh son,15/09/2026,18/09/2026,Completed,,
+VHB_1015,VINH HY BAY,Lan bien ngam san ho tai vinh Vinh Hy,15/10/2026,17/10/2026,Completed,,
+NB_1202,NINH BINH,Tham quan danh lam thang canh co do,02/12/2026,04/12/2026,Completed,VTM_1215,TVB_0325;HDT_0909;TBP_0621;DQB_0120;LTKA_0708;PVD_0430;DMQ_0818;TTH_0222;PTM_1003;NVL_0127

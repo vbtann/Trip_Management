@@ -49,14 +49,16 @@
 #include <vector>
 
 // Project Headers
-// #include "../Managers/FileManager.h"
+#include "../Managers/FileManager.h"
 #include "../Managers/Observer.h"
 #include "../Managers/PersonManager.h"
+#include "../Managers/TripManager.h"
 #include "../Models/header.h"
 #include "ManagePeopleDialog.h"
-// #include "../Managers/TripManager.h"
-// #include "AddTripDialog.h"
-// #include "FilterTripDialog.h"
+
+// Forward declaration for the restoration function
+void restoreTripAttendeesFromCache(vector<TRIP> &trips, PERSONMANAGER *personManager, const string &filePath);
+void saveTripAttendeesToCache(const vector<TRIP> &trips, const string &filePath);
 
 class TRIP;
 class TRIPMANAGER;
@@ -70,12 +72,10 @@ class MainWindow : public QMainWindow, public OBSERVER {
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    // Trip observer methods
+    // Observer pattern methods
     void onTripAdded(const string &tripID) override;
     void onTripRemoved(const string &tripID) override;
     void onTripUpdated(const string &tripID) override;
-
-    // Person observer methods
     void onPersonAdded(const string &personID) override;
     void onPersonRemoved(const string &personID) override;
     void onPersonUpdated(const string &personID) override;
@@ -129,8 +129,8 @@ class MainWindow : public QMainWindow, public OBSERVER {
     void updateTripDisplay(const std::vector<TRIP> trips);
     void updateStatusBar(const vector<TRIP>);
     void addDebugMessage(const QString &message);
-    void loadCacheFromFile(vector<TRIP> &ouputTrips);
-    void saveCacheToFile();
+    void loadCacheFromFile(vector<TRIP> &outputTrips);  // Updated to include attendees
+    void saveCacheToFile();                             // Updated to use new save function
 
     // UI Components
     QWidget *centralWidget;
@@ -187,8 +187,8 @@ class MainWindow : public QMainWindow, public OBSERVER {
     QProgressBar *progressBar;
 
     // Data
-    TRIPMANAGER *tripManager;
     PERSONMANAGER *personManager;
+    TRIPMANAGER *tripManager;
     const QString projectPath = "D:/Study/HCMUS/1st year/sem 3/OOP/Project";
 };
 

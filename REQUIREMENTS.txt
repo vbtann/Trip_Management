@@ -1,0 +1,69 @@
+# Trip Management System - Requirements
+
+## System Requirements
+
+### Minimum System Requirements:
+- **OS**: Windows 10/11, Linux (Ubuntu 18.04+), macOS 10.15+
+- **RAM**: 4GB minimum, 8GB recommended
+- **Storage**: 500MB free space
+- **Display**: 1024x768 minimum resolution
+
+### Software Dependencies:
+
+#### Core Requirements:
+- **Qt Framework**: 5.15.0 or higher (Qt 6.x recommended)
+- **C++ Compiler**: 
+  - Windows: MinGW 8.1+ or MSVC 2019+
+  - Linux: GCC 7+ or Clang 8+
+  - macOS: Xcode 11+ or Clang 8+
+
+#### Build Tools:
+- **qmake**: Included with Qt installation
+- **make**: 
+  - Windows: MinGW make (included with Qt)
+  - Linux/macOS: GNU make (usually pre-installed)
+
+## Qt Modules Used:
+- `Qt6Core` or `Qt5Core` - Core functionality
+- `Qt6Widgets` or `Qt5Widgets` - GUI components
+- `Qt6Gui` or `Qt5Gui` - GUI foundation
+
+## C++ Standard:
+- **C++17** or higher required
+- Modern C++ features used:
+  - Auto type deduction
+  - Range-based for loops
+  - Lambda expressions
+  - Smart pointers
+
+## File Format Support:
+- **CSV**: For import/export functionality
+- **Text**: For configuration and cache files
+
+## Development Environment (Optional):
+- **Qt Creator**: Recommended IDE
+- **Visual Studio Code**: Alternative with C++ extensions
+- **CLion**: JetBrains IDE option
+
+## Installation Links:
+- **Qt**: https://www.qt.io/download-qt-installer
+- **MinGW**: Included with Qt installer
+- **Visual Studio**: https://visualstudio.microsoft.com/downloads/
+- **Xcode**: Available from Mac App Store
+
+## Verification Commands:
+```bash
+# Check Qt installation
+qmake -version
+
+# Check compiler
+g++ --version    # Linux/macOS
+gcc --version    # Windows MinGW
+cl              # Windows MSVC
+```
+
+## Notes:
+- Project is designed to be self-contained
+- No external libraries beyond Qt required
+- Sample data files included for testing
+- Cross-platform compatible
