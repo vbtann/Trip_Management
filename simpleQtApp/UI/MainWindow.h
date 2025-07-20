@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QDateTime>
 #include <QDialog>
+#include <QDir>
 #include <QMainWindow>
 #include <QWidget>
 
@@ -189,7 +190,13 @@ class MainWindow : public QMainWindow, public OBSERVER {
     // Data
     PERSONMANAGER *personManager;
     TRIPMANAGER *tripManager;
-    const QString projectPath = "D:/Study/HCMUS/1st year/sem 3/OOP/Project";
+
+    // Helper function to get project path (relative to executable)
+    QString getProjectPath() const {
+        QDir currentDir = QDir::current();
+        currentDir.cdUp();  // Go up from simpleQtApp to project root
+        return currentDir.absolutePath();
+    }
 };
 
 #endif  // MAINWINDOW_H

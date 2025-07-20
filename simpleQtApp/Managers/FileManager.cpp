@@ -3,8 +3,13 @@
 #include "../Models/header.h"
 #include "PersonManager.h"
 
-// Helper function to get cache file path
-QString getCacheFilePath() { return "D:/Study/HCMUS/1st year/sem 3/OOP/Project/cache.csv"; }
+// Helper function to get cache file path (relative to executable)
+QString getCacheFilePath() {
+    QDir currentDir = QDir::current();
+    // Go up one level from simpleQtApp directory to project root
+    currentDir.cdUp();
+    return currentDir.absoluteFilePath("cache.csv");
+}
 
 // Check if cache file exists
 bool cacheFileExists() {
@@ -235,8 +240,13 @@ void loadCacheFile(vector<TRIP> &trips) {
     }
 }
 
-// Helper function to get people cache file path
-QString getPeopleCacheFilePath() { return "D:/Study/HCMUS/1st year/sem 3/OOP/Project/people_cache.csv"; }
+// Helper function to get people cache file path (relative to executable)
+QString getPeopleCacheFilePath() {
+    QDir currentDir = QDir::current();
+    // Go up one level from simpleQtApp directory to project root
+    currentDir.cdUp();
+    return currentDir.absoluteFilePath("people_cache.csv");
+}
 
 // Check if people cache file exists
 bool peopleCacheFileExists() {

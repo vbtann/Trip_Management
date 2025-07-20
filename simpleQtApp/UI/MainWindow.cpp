@@ -130,8 +130,8 @@ void MainWindow::setupSidebar() {
     managementGroup = new QGroupBox("🎯 Trip Management");
     QVBoxLayout *mgmtLayout = new QVBoxLayout(managementGroup);
     addTripButton = new QPushButton("➕ Add New Trip");
-    editTripButton = new QPushButton("✏️ Edit Trip");
     deleteButton = new QPushButton("🗑️ Delete Trip");
+    editTripButton = new QPushButton("✏️ Edit Trip");
     duplicateButton = new QPushButton("📋 Duplicate Trip");
     detailViewButton = new QPushButton("🔍 View Detail");
 
@@ -141,8 +141,8 @@ void MainWindow::setupSidebar() {
     deleteButton->setStyleSheet("QPushButton { background-color: #f44336; color: white; }");
 
     mgmtLayout->addWidget(addTripButton);
-    mgmtLayout->addWidget(editTripButton);
     mgmtLayout->addWidget(deleteButton);
+    mgmtLayout->addWidget(editTripButton);
     mgmtLayout->addWidget(duplicateButton);
     mgmtLayout->addWidget(detailViewButton);
 
@@ -151,7 +151,7 @@ void MainWindow::setupSidebar() {
     QVBoxLayout *peopleLayout = new QVBoxLayout(peopleGroup);
 
     // Add Import/Export buttons first
-    QHBoxLayout *peopleImportExportLayout = new QHBoxLayout();
+    QVBoxLayout *peopleImportExportLayout = new QVBoxLayout();
 
     importPeopleButton = new QPushButton("📥 Import People");
     importPeopleButton->setStyleSheet(
@@ -421,8 +421,8 @@ void MainWindow::addDebugMessage(const QString &message) {
 // ========================================
 
 void MainWindow::onImportTripsClicked() {
-    QString fileName =
-        QFileDialog::getOpenFileName(this, "Import Trip Information", projectPath, "CSV Files (*.csv);;All Files (*)");
+    QString fileName = QFileDialog::getOpenFileName(this, "Import Trip Information", getProjectPath(),
+                                                    "CSV Files (*.csv);;All Files (*)");
 
     if (!fileName.isEmpty()) {
         addDebugMessage("Starting import from: " + fileName);
@@ -450,8 +450,9 @@ void MainWindow::onExportTripsClicked() {
         return;
     }
 
-    QString fileName = QFileDialog::getSaveFileName(this, "Export Trip Information", projectPath + "/trips_export.csv",
-                                                    "CSV Files (*.csv);;Text Files (*.txt);;All Files (*)");
+    QString fileName =
+        QFileDialog::getSaveFileName(this, "Export Trip Information", getProjectPath() + "/trips_export.csv",
+                                     "CSV Files (*.csv);;Text Files (*.txt);;All Files (*)");
 
     if (!fileName.isEmpty()) {
         addDebugMessage("Exporting to: " + fileName);
@@ -481,6 +482,9 @@ void MainWindow::onAddTripClicked() {
     if (dialog.exec() == QDialog::Accepted) {
         TRIP newTrip = dialog.getTripData();
         tripManager->addTrip(newTrip);
+        QMessageBox::information(
+            this, "Trip Added",
+            QString("Trip to %1 has been added successfully.").arg(QString::fromStdString(newTrip.getDestination())));
     } else {
         addDebugMessage("Add trip operation was cancelled.");
     }
@@ -530,6 +534,8 @@ void MainWindow::onDeleteTripClicked() {
         bool success = tripManager->removeTrip(tripIdToDelete.toStdString());
 
         if (success) {
+            QMessageBox::information(this, "Trip Deleted",
+                                     QString("Trip to %1 has been deleted successfully.").arg(destination));
             addDebugMessage("Deleted trip with ID: " + tripIdToDelete);
         } else {
             addDebugMessage("Error: Could not find trip with ID to delete: " + tripIdToDelete);
@@ -725,8 +731,8 @@ void MainWindow::onPersonUpdated(const string &personID) {
 void MainWindow::onImportPeopleClicked() {
     addDebugMessage("Opening People Import dialog...");
 
-    QString filename =
-        QFileDialog::getOpenFileName(this, "Import People from CSV", projectPath, "CSV Files (*.csv);;All Files (*.*)");
+    QString filename = QFileDialog::getOpenFileName(this, "Import People from CSV", getProjectPath(),
+                                                    "CSV Files (*.csv);;All Files (*.*)");
 
     if (filename.isEmpty()) {
         return;  // User canceled
@@ -787,8 +793,8 @@ void MainWindow::onExportPeopleClicked() {
         return;
     }
 
-    QString filename = QFileDialog::getSaveFileName(this, "Export People to CSV", projectPath + "/people_export.csv",
-                                                    "CSV Files (*.csv);;All Files (*.*)");
+    QString filename = QFileDialog::getSaveFileName(
+        this, "Export People to CSV", getProjectPath() + "/people_export.csv", "CSV Files (*.csv);;All Files (*.*)");
 
     if (filename.isEmpty()) {
         return;  // User canceled

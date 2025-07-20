@@ -6,43 +6,29 @@ The **Trip Management System** is a comprehensive Qt-based desktop application d
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- **Qt Framework** (version 5.15 or higher recommended)
-- **C++ Compiler** (MinGW, MSVC, or GCC)
-- **qmake** (comes with Qt installation)
+### ⚡ Super Fast Setup (5 minutes total):
 
-### Installation Steps
-
-1. **Download Qt**
-   - Visit [Qt Official Website](https://www.qt.io/download-qt-installer)
-   - Download and install Qt with MinGW compiler
-   - Make sure to add Qt's bin directory to your system PATH
-
-2. **Download This Project**
-   - Download the ZIP file from GitHub
-   - Extract to your desired location
-
-3. **Build and Run**
-   ```batch
-   # Simply double-click build.bat
-   # Or run from command line:
-   build.bat
-   ```
-
-4. **Launch Application**
-   ```batch
-   # Double-click run.bat
-   # Or run from command line:
-   run.bat
-   ```
-
-### Alternative Manual Build
-If the batch files don't work, you can build manually:
-```bash
-cd simpleQtApp
-qmake simpleQtApp.pro
-make
+**Option A: Automatic (Windows with package manager):**
+```batch
+# If you have Chocolatey or Scoop installed:
+install_qt.bat
 ```
+
+**Option B: Manual (Recommended - All platforms):**
+1. **Install Qt** (one-time setup):
+   - Windows: Download from [Qt.io](https://www.qt.io/download-qt-installer)
+   - Linux: `sudo apt install qt6-base-dev qt6-tools-dev build-essential`
+   - Mac: `brew install qt6`
+
+2. **Build & Run** (2 clicks):
+   ```batch
+   build.bat    # Compiles everything
+   run.bat      # Launches the app
+   ```
+
+**That's it!** 🎉
+
+> **Need help?** See [`INSTALL_GUIDE.md`](INSTALL_GUIDE.md) for step-by-step instructions with screenshots.
 
 ## 🛠️ Features
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QDebug>
+#include <QDir>
 #include <QFileInfo>
 #include <QMessageBox>
 #include <fstream>
