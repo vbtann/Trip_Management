@@ -41,6 +41,7 @@ class AddTripDialog : public QDialog {
     void setupUI();
     void setupPeopleSelection();
     void updateMemberList();
+    void updateHostList();
     void updateSelectedCounts();
     bool validatePeopleSelection();
 
@@ -54,18 +55,29 @@ class AddTripDialog : public QDialog {
     QPushButton *cancelButton;
 
     // UI Components - People Selection
+    // Host section
     QGroupBox *hostGroupBox;
     QGroupBox *membersGroupBox;
-    QComboBox *hostComboBox;
+    QListWidget *hostsListWidget;
+    QLabel *selectedHostLabel;
+    // Host Search
+    QHBoxLayout *hostSearchLayout;
+    QTextEdit *hostSearchBar;
+    QPushButton *clearHostSearchButton;
+    // Members section
     QListWidget *membersListWidget;
     QPushButton *selectAllMembersButton;
     QPushButton *clearAllMembersButton;
-    QLabel *selectedHostLabel;
     QLabel *selectedMembersLabel;
+    // Member Search
+    QHBoxLayout *memberSearchLayout;
+    QTextEdit *memberSearchBar;
+    QPushButton *clearMemberSearchButton;
 
     // Data
     TRIP _tripData;
     PERSONMANAGER *personManager;
+    QSet<QString> selectedMemberIDs;
 };
 
 #endif  // TRIPDIALOG_H

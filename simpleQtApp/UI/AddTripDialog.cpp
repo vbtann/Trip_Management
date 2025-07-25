@@ -58,7 +58,7 @@ AddTripDialog::AddTripDialog(PERSONMANAGER *personManager, QWidget *parent)
 void AddTripDialog::setupUI() {
     // Set up fonts for better readability
     QFont labelFont;
-    labelFont.setPointSize(11);
+    labelFont.setPointSize(13);
     labelFont.setBold(true);
 
     QFont inputFont;
@@ -74,7 +74,7 @@ void AddTripDialog::setupUI() {
         "    padding: 8px 12px; "
         "    border: 2px solid #ddd; "
         "    border-radius: 6px; "
-        "    font-size: 12px; "
+        "    font-size: 15px; "
         "}"
         "QLineEdit:focus { "
         "    border-color: #4CAF50; "
@@ -82,7 +82,7 @@ void AddTripDialog::setupUI() {
         "}");
 
     descriptionTextEdit = new QTextEdit(this);
-    descriptionTextEdit->setMaximumHeight(60);  // Keep compact for left panel
+    descriptionTextEdit->setMaximumHeight(200);  // Keep compact for left panel
     descriptionTextEdit->setPlaceholderText("Enter trip description...");
     descriptionTextEdit->setFont(inputFont);
     descriptionTextEdit->setStyleSheet(
@@ -90,7 +90,7 @@ void AddTripDialog::setupUI() {
         "    padding: 8px 12px; "
         "    border: 2px solid #ddd; "
         "    border-radius: 6px; "
-        "    font-size: 12px; "
+        "    font-size: 15px; "
         "}"
         "QTextEdit:focus { "
         "    border-color: #4CAF50; "
@@ -107,7 +107,7 @@ void AddTripDialog::setupUI() {
         "    padding: 8px 12px; "
         "    border: 2px solid #ddd; "
         "    border-radius: 6px; "
-        "    font-size: 12px; "
+        "    font-size: 15px; "
         "}"
         "QDateEdit:focus { border-color: #4CAF50; }");
 
@@ -121,7 +121,7 @@ void AddTripDialog::setupUI() {
         "    padding: 8px 12px; "
         "    border: 2px solid #ddd; "
         "    border-radius: 6px; "
-        "    font-size: 12px; "
+        "    font-size: 15px; "
         "}"
         "QDateEdit:focus { border-color: #4CAF50; }");
 
@@ -137,7 +137,7 @@ void AddTripDialog::setupUI() {
         "    padding: 8px 12px; "
         "    border: 2px solid #ddd; "
         "    border-radius: 6px; "
-        "    font-size: 12px; "
+        "    font-size: 15px; "
         "}"
         "QComboBox:focus { border-color: #4CAF50; }");
 
@@ -161,7 +161,7 @@ void AddTripDialog::setupUI() {
     QString labelStyle =
         "QLabel { "
         "    font-weight: bold; "
-        "    font-size: 13px; "
+        "    font-size: 18px; "
         "    color: #333; "
         "    padding-right: 8px; "
         "}";
@@ -196,8 +196,8 @@ void AddTripDialog::setupUI() {
         "    padding: 0 5px 0 5px; "
         "}");
     tripInfoGroupBox->setLayout(tripInfoLayout);
-    tripInfoGroupBox->setFixedWidth(400);     // Fixed width for left panel
-    tripInfoGroupBox->setMaximumHeight(350);  // Fixed height for trip info
+    tripInfoGroupBox->setFixedWidth(505);     // Fixed width for left panel
+    tripInfoGroupBox->setMaximumHeight(650);  // Fixed height for trip info
 
     // Create buttons for trip info section
     okButton = new QPushButton("✅ Add Trip", this);
@@ -251,7 +251,7 @@ void AddTripDialog::setupUI() {
 
     QWidget *leftPanelWidget = new QWidget();
     leftPanelWidget->setLayout(leftPanelLayout);
-    leftPanelWidget->setFixedWidth(420);  // Fixed width for entire left panel
+    leftPanelWidget->setFixedWidth(520);  // Fixed width for entire left panel
 
     // RIGHT PANEL - People selection (dynamic height)
     QVBoxLayout *rightPanelLayout = new QVBoxLayout();
@@ -259,12 +259,12 @@ void AddTripDialog::setupUI() {
     rightPanelLayout->setSpacing(10);
 
     // Host section (smaller - about 25% of right panel)
-    hostGroupBox->setMaximumHeight(180);
+    hostGroupBox->setMaximumHeight(280);
 
     // Members section (larger - about 75% of right panel)
     membersGroupBox->setMinimumHeight(400);
 
-    rightPanelLayout->addWidget(hostGroupBox, 1);     // 25% weight
+    rightPanelLayout->addWidget(hostGroupBox, 2);     // 25% weight
     rightPanelLayout->addWidget(membersGroupBox, 3);  // 75% weight
 
     QWidget *rightPanelWidget = new QWidget();
@@ -338,30 +338,67 @@ void AddTripDialog::setupPeopleSelection() {
     QVBoxLayout *hostLayout = new QVBoxLayout(hostGroupBox);
     hostLayout->setSpacing(8);
 
-    selectedHostLabel = new QLabel("No host selected");
+    selectedHostLabel = new QLabel("❌ No host selected");
     selectedHostLabel->setStyleSheet(
         "QLabel { "
-        "    color: #7f8c8d; "
+        "    color: #e74c3c; "
         "    font-style: italic; "
         "    font-size: 13px; "
         "    padding: 4px; "
         "}");
 
-    hostComboBox = new QComboBox();
-    hostComboBox->setMinimumHeight(35);
-    hostComboBox->setStyleSheet(
-        "QComboBox { "
-        "    padding: 8px 12px; "
+    // Host search layout
+    hostSearchLayout = new QHBoxLayout();
+
+    hostSearchBar = new QTextEdit();
+    hostSearchBar->setPlaceholderText("Search hosts...");
+    hostSearchBar->setMaximumHeight(45);
+    hostSearchBar->setStyleSheet(R"(
+                                 padding: 8px 12px;
+                              )");
+
+    clearHostSearchButton = new QPushButton("Clear");
+    clearHostSearchButton->setStyleSheet(
+        "QPushButton { "
+        "    background-color: #95a5a6; "
+        "    color: white; "
+        "    border: none; "
+        "    padding: 6px 12px; "
+        "    border-radius: 4px; "
+        "    font-size: 11px; "
+        "    font-weight: bold; "
+        "}"
+        "QPushButton:hover { background-color: #7f8c8d; }");
+
+    hostSearchLayout->addWidget(hostSearchBar);
+    hostSearchLayout->addWidget(clearHostSearchButton);
+
+    // Host list widget (single selection)
+    hostsListWidget = new QListWidget();
+    hostsListWidget->setSelectionMode(QAbstractItemView::SingleSelection);  // Only one host can be selected
+    hostsListWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    hostsListWidget->setStyleSheet(
+        "QListWidget { "
         "    border: 2px solid #ddd; "
         "    border-radius: 5px; "
         "    font-size: 13px; "
         "    background-color: white; "
         "}"
-        "QComboBox:focus { border-color: #e67e22; }");
+        "QListWidget::item { "
+        "    padding: 8px; "
+        "    border-bottom: 1px solid #eee; "
+        "}"
+        "QListWidget::item:hover { "
+        "    background-color: #ecf0f1; "
+        "}"
+        "QListWidget::item:selected { "
+        "    background-color: #e67e22; "
+        "    color: white; "
+        "}");
 
     hostLayout->addWidget(selectedHostLabel);
-    hostLayout->addWidget(hostComboBox);
-    hostLayout->addStretch();  // Push content to top
+    hostLayout->addLayout(hostSearchLayout);
+    hostLayout->addWidget(hostsListWidget, 1);  // Give list widget remaining space
 
     // Members selection group (LARGER - about 80% of people area)
     membersGroupBox = new QGroupBox("👥 Select Members");
@@ -425,6 +462,32 @@ void AddTripDialog::setupPeopleSelection() {
     memberButtonsLayout->addWidget(clearAllMembersButton);
     memberButtonsLayout->addStretch();
 
+    memberSearchLayout = new QHBoxLayout();
+
+    memberSearchBar = new QTextEdit();
+    memberSearchBar->setPlaceholderText("Search members...");
+    memberSearchBar->setMaximumHeight(45);
+    memberSearchBar->setStyleSheet(R"(
+                                   padding: 8px 12px;
+                                )");
+
+    clearMemberSearchButton = new QPushButton("Clear");
+    clearMemberSearchButton->setStyleSheet(R"(
+                                           QPushButton { 
+                                               background-color: #95a5a6; 
+                                               color: white; 
+                                               border: none; 
+                                               padding: 6px 12px; 
+                                               border-radius: 4px; 
+                                               font-size: 11px; 
+                                               font-weight: bold; 
+                                           }
+                                           QPushButton:hover { background-color: #7f8c8d; }
+                                           )");
+
+    memberSearchLayout->addWidget(memberSearchBar);
+    memberSearchLayout->addWidget(clearMemberSearchButton);
+
     membersListWidget = new QListWidget();
     membersListWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     membersListWidget->setStyleSheet(
@@ -448,26 +511,35 @@ void AddTripDialog::setupPeopleSelection() {
 
     membersLayout->addWidget(selectedMembersLabel);
     membersLayout->addLayout(memberButtonsLayout);
+    membersLayout->addLayout(memberSearchLayout);
     membersLayout->addWidget(membersListWidget, 1);  // Give list widget all remaining space
 
     // Connect signals
-    connect(hostComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-            &AddTripDialog::onHostSelectionChanged);
+    connect(hostsListWidget, &QListWidget::itemSelectionChanged, this, &AddTripDialog::onHostSelectionChanged);
+    connect(hostSearchBar, &QTextEdit::textChanged, this, &AddTripDialog::updateHostList);
+    connect(clearHostSearchButton, &QPushButton::clicked, [this]() {
+        hostSearchBar->clear();
+        updateHostList();
+    });
+
     connect(membersListWidget, &QListWidget::itemChanged, this,
             &AddTripDialog::onMemberSelectionChanged);  // FIX: Complete this line
     connect(selectAllMembersButton, &QPushButton::clicked, this, &AddTripDialog::onSelectAllMembers);
     connect(clearAllMembersButton, &QPushButton::clicked, this, &AddTripDialog::onClearAllMembers);
+    connect(memberSearchBar, &QTextEdit::textChanged, this, &AddTripDialog::updateMemberList);
+    connect(clearMemberSearchButton, &QPushButton::clicked, [this]() {
+        memberSearchBar->clear();
+        updateMemberList();
+    });
 
     // Update people lists
+    updateHostList();
     updateMemberList();
 }
 
 void AddTripDialog::updateMemberList() {
     if (!personManager) {
         // If no PersonManager, disable people selection
-        hostComboBox->addItem("No people available - Please add people first");
-        hostComboBox->setEnabled(false);
-
         QListWidgetItem *disabledItem = new QListWidgetItem("No people available - Please add people first");
         disabledItem->setFlags(Qt::NoItemFlags);  // Make it non-interactive
         membersListWidget->addItem(disabledItem);
@@ -478,22 +550,27 @@ void AddTripDialog::updateMemberList() {
         return;
     }
 
+    for (int i = 0; i < membersListWidget->count(); ++i) {
+        QListWidgetItem *item = membersListWidget->item(i);
+        if (item && item->data(Qt::CheckStateRole).toInt() == Qt::Checked) {
+            QString memberID = item->data(Qt::UserRole).toString();
+            if (!memberID.isEmpty()) {
+                selectedMemberIDs.insert(memberID);
+            }
+        } else if (item) {
+            // If item is unchecked, remove from selection set
+            QString memberID = item->data(Qt::UserRole).toString();
+            if (!memberID.isEmpty()) {
+                selectedMemberIDs.remove(memberID);
+            }
+        }
+    }
     // Clear existing items
-    hostComboBox->clear();
     membersListWidget->clear();
 
     // Get all people
-    vector<HOST> hosts = personManager->getAllHosts();
     vector<MEMBER> members = personManager->getAllMembers();
-
-    // Populate host combo box - Store ID instead of pointer
-    hostComboBox->addItem("-- Select a Host --", QString(""));
-    for (const HOST &host : hosts) {
-        QString hostInfo = QString("%1 (ID: %2)")
-                               .arg(QString::fromStdString(host.getFullName()))
-                               .arg(QString::fromStdString(host.getID()));
-        hostComboBox->addItem(hostInfo, QString::fromStdString(host.getID()));  // Store ID instead of pointer
-    }
+    QString memberSearchName = memberSearchBar->toPlainText().trimmed();
 
     // Populate members list widget - Store ID instead of pointer
     for (const MEMBER &member : members) {
@@ -501,11 +578,73 @@ void AddTripDialog::updateMemberList() {
                                  .arg(QString::fromStdString(member.getFullName()))
                                  .arg(QString::fromStdString(member.getID()));
 
+        if (!memberSearchName.isEmpty() && !memberInfo.contains(memberSearchName, Qt::CaseInsensitive)) {
+            continue;
+        }
+
         QListWidgetItem *item = new QListWidgetItem(memberInfo);
         item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-        item->setData(Qt::CheckStateRole, Qt::Unchecked);
-        item->setData(Qt::UserRole, QString::fromStdString(member.getID()));  // Store ID instead of pointer
+
+        QString memberID = QString::fromStdString(member.getID());
+        item->setData(Qt::UserRole, memberID);
+
+        if (selectedMemberIDs.contains(memberID)) {
+            item->setData(Qt::CheckStateRole, Qt::Checked);
+        } else {
+            item->setData(Qt::CheckStateRole, Qt::Unchecked);
+        }
+
         membersListWidget->addItem(item);
+    }
+
+    updateSelectedCounts();
+}
+
+void AddTripDialog::updateHostList() {
+    if (!personManager) {
+        // If no PersonManager, disable host selection
+        QListWidgetItem *disabledItem = new QListWidgetItem("No people available - Please add people first");
+        disabledItem->setFlags(Qt::NoItemFlags);  // Make it non-interactive
+        hostsListWidget->addItem(disabledItem);
+        hostsListWidget->setEnabled(false);
+        return;
+    }
+
+    // Preserve current selection
+    QString selectedHostID;
+    QListWidgetItem *currentItem = hostsListWidget->currentItem();
+    if (currentItem) {
+        selectedHostID = currentItem->data(Qt::UserRole).toString();
+    }
+
+    // Clear existing items
+    hostsListWidget->clear();
+
+    // Get all hosts and apply search filter
+    vector<HOST> hosts = personManager->getAllHosts();
+    QString hostSearchName = hostSearchBar->toPlainText().trimmed();
+
+    // Populate hosts list widget
+    for (const HOST &host : hosts) {
+        QString hostInfo = QString("%1 (ID: %2)")
+                               .arg(QString::fromStdString(host.getFullName()))
+                               .arg(QString::fromStdString(host.getID()));
+
+        // Apply search filter
+        if (!hostSearchName.isEmpty() && !hostInfo.contains(hostSearchName, Qt::CaseInsensitive)) {
+            continue;
+        }
+
+        QListWidgetItem *item = new QListWidgetItem(hostInfo);
+        QString hostID = QString::fromStdString(host.getID());
+        item->setData(Qt::UserRole, hostID);
+
+        hostsListWidget->addItem(item);
+
+        // Restore selection if this was the previously selected host
+        if (hostID == selectedHostID) {
+            hostsListWidget->setCurrentItem(item);
+        }
     }
 
     updateSelectedCounts();
@@ -513,23 +652,47 @@ void AddTripDialog::updateMemberList() {
 
 void AddTripDialog::onHostSelectionChanged() { updateSelectedCounts(); }
 
-void AddTripDialog::onMemberSelectionChanged() { updateSelectedCounts(); }
-
-void AddTripDialog::onSelectAllMembers() {
+void AddTripDialog::onMemberSelectionChanged() {
+    // Update the persistent tracking set when selections change
+    // selectedMemberIDs.clear();
     for (int i = 0; i < membersListWidget->count(); ++i) {
         QListWidgetItem *item = membersListWidget->item(i);
-        if (item && item->flags() & Qt::ItemIsUserCheckable) {  // Check if item is checkable
-            item->setData(Qt::CheckStateRole, Qt::Checked);     // FIX: Use setData with CheckStateRole
+        if (item && item->data(Qt::CheckStateRole).toInt() == Qt::Checked) {
+            QString memberID = item->data(Qt::UserRole).toString();
+            if (!memberID.isEmpty()) {
+                selectedMemberIDs.insert(memberID);
+            }
+        }
+    }
+
+    updateSelectedCounts();
+}
+
+void AddTripDialog::onSelectAllMembers() {
+    // Add all currently displayed members to selection set
+    for (int i = 0; i < membersListWidget->count(); ++i) {
+        QListWidgetItem *item = membersListWidget->item(i);
+        if (item && item->flags() & Qt::ItemIsUserCheckable) {
+            item->setData(Qt::CheckStateRole, Qt::Checked);
+            QString memberID = item->data(Qt::UserRole).toString();
+            if (!memberID.isEmpty()) {
+                selectedMemberIDs.insert(memberID);
+            }
         }
     }
     updateSelectedCounts();
 }
 
 void AddTripDialog::onClearAllMembers() {
+    // Remove all currently displayed members from selection set
     for (int i = 0; i < membersListWidget->count(); ++i) {
         QListWidgetItem *item = membersListWidget->item(i);
-        if (item && item->flags() & Qt::ItemIsUserCheckable) {  // Check if item is checkable
-            item->setData(Qt::CheckStateRole, Qt::Unchecked);   // FIX: Use setData with CheckStateRole
+        if (item && item->flags() & Qt::ItemIsUserCheckable) {
+            item->setData(Qt::CheckStateRole, Qt::Unchecked);
+            QString memberID = item->data(Qt::UserRole).toString();
+            if (!memberID.isEmpty()) {
+                selectedMemberIDs.remove(memberID);
+            }
         }
     }
     updateSelectedCounts();
@@ -537,25 +700,38 @@ void AddTripDialog::onClearAllMembers() {
 
 void AddTripDialog::updateSelectedCounts() {
     // Update host label
-    if (hostComboBox->currentIndex() > 0) {
-        selectedHostLabel->setText(QString("✅ Host selected: %1").arg(hostComboBox->currentText()));
+    QListWidgetItem *selectedHostItem = hostsListWidget->currentItem();
+    if (selectedHostItem) {
+        QString hostName = selectedHostItem->text();
+        selectedHostLabel->setText(QString("✅ Host selected: %1").arg(hostName));
         selectedHostLabel->setStyleSheet("color: #27ae60; font-weight: bold;");
     } else {
         selectedHostLabel->setText("❌ No host selected");
         selectedHostLabel->setStyleSheet("color: #e74c3c; font-style: italic;");
     }
 
-    // FIX: Count selected members using data() with CheckStateRole
-    int selectedCount = 0;
+    // Count total selected members (including those not currently displayed due to search)
+    int totalSelectedCount = selectedMemberIDs.size();
+    int displayedSelectedCount = 0;
+
+    // Count how many selected members are currently displayed
     for (int i = 0; i < membersListWidget->count(); ++i) {
         QListWidgetItem *item = membersListWidget->item(i);
-        if (item && item->data(Qt::CheckStateRole).toInt() == Qt::Checked) {  // FIX: Use data() with CheckStateRole
-            selectedCount++;
+        if (item && item->data(Qt::CheckStateRole).toInt() == Qt::Checked) {
+            displayedSelectedCount++;
         }
     }
 
-    if (selectedCount > 0) {
-        selectedMembersLabel->setText(QString("✅ %1 member(s) selected").arg(selectedCount));
+    if (totalSelectedCount > 0) {
+        QString searchText = memberSearchBar->toPlainText().trimmed();
+        if (!searchText.isEmpty() && displayedSelectedCount != totalSelectedCount) {
+            // Show both displayed and total when filtering
+            selectedMembersLabel->setText(
+                QString("✅ %1 of %2 selected member(s) shown").arg(displayedSelectedCount).arg(totalSelectedCount));
+        } else {
+            // Show just total when not filtering
+            selectedMembersLabel->setText(QString("✅ %1 member(s) selected").arg(totalSelectedCount));
+        }
         selectedMembersLabel->setStyleSheet("color: #27ae60; font-weight: bold;");
     } else {
         selectedMembersLabel->setText("❌ No members selected");
@@ -565,7 +741,7 @@ void AddTripDialog::updateSelectedCounts() {
 
 bool AddTripDialog::validatePeopleSelection() {
     // Check if host is selected
-    if (personManager && hostComboBox->currentIndex() <= 0) {
+    if (personManager && !hostsListWidget->currentItem()) {
         QMessageBox::warning(this, "Host Required",
                              "Please select a host for the trip!\n\n"
                              "Every trip must have a host.");
@@ -593,16 +769,43 @@ bool AddTripDialog::validatePeopleSelection() {
 
 void AddTripDialog::acceptDialog() {
     // Validate input fields
+
+    // Destination Check
     if (destinationLineEdit->text().trimmed().isEmpty()) {
         QMessageBox::warning(this, "Validation Error",
                              "Destination cannot be empty!\n\nPlease enter a destination for your trip.");
         destinationLineEdit->setFocus();
         return;
+    } else if (destinationLineEdit->text().trimmed().length() < 3 ||
+               destinationLineEdit->text().trimmed().length() > 10) {
+        QMessageBox::warning(this, "Validation Error",
+                             "Destination must be between 3 and 10 characters!\n\nPlease enter a valid destination.");
+        destinationLineEdit->setFocus();
+        return;
+    } else {
+        string text = destinationLineEdit->text().trimmed().toUpper().toStdString();
+        for (char c : text) {
+            if (!isupper(c) && !isdigit(c)) {
+                QMessageBox::warning(this, "Validation Error",
+                                     "Destination can only contain uppercase letters and digits!\n\n"
+                                     "Please enter a valid destination.");
+                destinationLineEdit->setFocus();
+                return;
+            }
+        }
     }
 
+    // Description Check
     if (descriptionTextEdit->toPlainText().trimmed().isEmpty()) {
         QMessageBox::warning(this, "Validation Error",
-                             "Description cannot be empty!\n\nPlease provide a description for your trip.");
+                             "Description cannot be empty!\n\nPlease enter a description for your trip.");
+        descriptionTextEdit->setFocus();
+        return;
+    } else if (descriptionTextEdit->toPlainText().trimmed().length() < 10 ||
+               descriptionTextEdit->toPlainText().trimmed().length() > 200) {
+        QMessageBox::warning(
+            this, "Validation Error",
+            "Description must be between 10 and 200 characters!\n\nPlease enter a valid description for your trip.");
         descriptionTextEdit->setFocus();
         return;
     }
@@ -641,12 +844,13 @@ void AddTripDialog::acceptDialog() {
 
         // Add selected host and members to the trip
         if (personManager) {
-            // FIX: Get host by ID instead of pointer
-            if (hostComboBox->currentIndex() > 0) {
-                QString hostID = hostComboBox->currentData().toString();  // Get ID string
+            // Get selected host
+            QListWidgetItem *selectedHostItem = hostsListWidget->currentItem();
+            if (selectedHostItem) {
+                QString hostID = selectedHostItem->data(Qt::UserRole).toString();
                 if (!hostID.isEmpty()) {
                     HOST selectedHost = personManager->getHostByID(hostID.toStdString());
-                    if (!selectedHost.getID().empty()) {  // Check if host was found
+                    if (!selectedHost.getID().empty()) {
                         _tripData.setHost(selectedHost);
                     }
                 }

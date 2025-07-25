@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setupUI();
     setupStatusBar();
     setMinimumSize(1200, 900);
+    resize(1500, 1000);
 
     // IMPORTANT: Load people BEFORE loading trips (so attendees can be restored)
     addDebugMessage("Loading people from cache...");
@@ -118,13 +119,9 @@ void MainWindow::setupSidebar() {
     QVBoxLayout *quickLayout = new QVBoxLayout(quickActionsGroup);
     importButton = new QPushButton("📥 Import Trips");
     exportButton = new QPushButton("📤 Export Trips");
-    saveButton = new QPushButton("💾 Save Project");
-    loadButton = new QPushButton("📂 Load Project");
 
     quickLayout->addWidget(importButton);
     quickLayout->addWidget(exportButton);
-    quickLayout->addWidget(saveButton);
-    quickLayout->addWidget(loadButton);
 
     // Trip Management Group
     managementGroup = new QGroupBox("🎯 Trip Management");
@@ -204,8 +201,6 @@ void MainWindow::setupSidebar() {
     // Connect ALL signals
     connect(importButton, &QPushButton::clicked, this, &MainWindow::onImportTripsClicked);
     connect(exportButton, &QPushButton::clicked, this, &MainWindow::onExportTripsClicked);
-    connect(saveButton, &QPushButton::clicked, this, &MainWindow::onSaveProjectClicked);
-    connect(loadButton, &QPushButton::clicked, this, &MainWindow::onLoadProjectClicked);
     connect(addTripButton, &QPushButton::clicked, this, &MainWindow::onAddTripClicked);
     connect(editTripButton, &QPushButton::clicked, this, &MainWindow::onEditTripClicked);
     connect(deleteButton, &QPushButton::clicked, this, &MainWindow::onDeleteTripClicked);
@@ -461,14 +456,6 @@ void MainWindow::onExportTripsClicked() {
         QMessageBox::information(this, "Export Complete",
                                  QString("Successfully exported %1 trips.").arg(currentTrips.size()));
     }
-}
-
-void MainWindow::onSaveProjectClicked() {
-    QMessageBox::information(this, "Save", "Save project functionality will be implemented.");
-}
-
-void MainWindow::onLoadProjectClicked() {
-    QMessageBox::information(this, "Load", "Load project functionality will be implemented.");
 }
 
 // ========================================

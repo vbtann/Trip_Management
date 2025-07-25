@@ -85,8 +85,6 @@ class MainWindow : public QMainWindow, public OBSERVER {
     // File Operations
     void onImportTripsClicked();
     void onExportTripsClicked();
-    void onSaveProjectClicked();
-    void onLoadProjectClicked();
 
     // Trip Management
     void onAddTripClicked();
@@ -161,8 +159,6 @@ class MainWindow : public QMainWindow, public OBSERVER {
     // Action Buttons
     QPushButton *importButton;
     QPushButton *exportButton;
-    QPushButton *saveButton;
-    QPushButton *loadButton;
     QPushButton *addTripButton;
     QPushButton *editTripButton;
     QPushButton *deleteButton;
